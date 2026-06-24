@@ -210,6 +210,9 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Autor: Vinícius Melo Seixas", content)
         self.assertIn('url("picture_cup_2026_1.png")', content)
         self.assertIn("Placar agora", content)
+        self.assertIn('aria-label="Sumario do dashboard"', content)
+        self.assertIn('href="#placar-agora"', content)
+        self.assertIn('id="proximas-etapas"', content)
 
     def test_render_html_shows_team_flags_when_available(self):
         data = {

@@ -710,6 +710,38 @@ def render_html(
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }}
+    .toc {{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    }}
+    .toc h2 {{
+      margin: 0 0 12px;
+      color: var(--text);
+      text-shadow: none;
+    }}
+    .toc-links {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }}
+    .toc-links a {{
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }}
+    .toc-links a:hover {{
+      background: var(--accent-soft);
+    }}
     .card {{
       background: var(--panel);
       border: 1px solid var(--line);
@@ -905,6 +937,7 @@ def render_html(
   </header>
   <main>
     {html_summary_cards(matches, completed, upcoming, leader_label)}
+    {html_dashboard_toc()}
     {html_live_scoreboard(live_matches_now)}
     {html_stage_dashboard(stage_summaries)}
     {html_group_tables(visible_tables)}
@@ -933,22 +966,44 @@ def html_summary_cards(
         <span>{escape_html(title)}</span>
         <strong>{escape_html(value)}</strong>
       </article>""" for title, value in cards)
-    return f"""    <section>
+    return f"""    <section id="resumo">
+      <h2>Resumo</h2>
       <div class="cards">
 {items}
       </div>
     </section>"""
 
 
+def html_dashboard_toc() -> str:
+    links = [
+        ("Resumo", "#resumo"),
+        ("Placar agora", "#placar-agora"),
+        ("Proximas etapas", "#proximas-etapas"),
+        ("Tabela dos grupos", "#tabela-grupos"),
+        ("Proximos jogos", "#proximos-jogos"),
+        ("Resultados recentes", "#resultados-recentes"),
+    ]
+    items = "\n".join(
+        f"""        <a href="{escape_html(target)}">{escape_html(label)}</a>"""
+        for label, target in links
+    )
+    return f"""    <nav class="toc" aria-label="Sumario do dashboard">
+      <h2>Sumario</h2>
+      <div class="toc-links">
+{items}
+      </div>
+    </nav>"""
+
+
 def html_live_scoreboard(matches: list[dict[str, Any]]) -> str:
     if not matches:
-        return """    <section>
+        return """    <section id="placar-agora">
       <h2>Placar agora</h2>
       <p class="empty">Nenhum jogo em andamento agora.</p>
     </section>"""
 
     items = "\n".join(html_live_match_card(match) for match in matches)
-    return f"""    <section>
+    return f"""    <section id="placar-agora">
       <h2>Placar agora</h2>
       <div class="live-scoreboards">
 {items}
@@ -1000,7 +1055,7 @@ def html_stage_dashboard(summaries: list[StageSummary]) -> str:
             if summaries
             else "Nenhuma etapa encontrada no periodo consultado."
         )
-        return f"""    <section>
+        return f"""    <section id="proximas-etapas">
       <h2>Proximas etapas</h2>
       <p class="empty">{escape_html(message)}</p>
     </section>"""
@@ -1013,7 +1068,7 @@ def html_stage_dashboard(summaries: list[StageSummary]) -> str:
             <td class="status-next">{summary.upcoming}</td>
             <td>{escape_html(format_stage_highlight(summary))}</td>
           </tr>""" for summary in pending_stages)
-    return f"""    <section>
+    return f"""    <section id="proximas-etapas">
       <h2>Proximas etapas</h2>
       <div class="table-wrap">
         <table>
@@ -1037,7 +1092,7 @@ def html_stage_dashboard(summaries: list[StageSummary]) -> str:
 
 def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
     if not tables:
-        return """    <section>
+        return """    <section id="tabela-grupos">
       <h2>Tabela dos grupos</h2>
       <p class="empty">Sem jogos encerrados no periodo consultado.</p>
     </section>"""
@@ -1079,7 +1134,7 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
         </table>
       </div>""")
 
-    return f"""    <section>
+    return f"""    <section id="tabela-grupos">
       <h2>Tabela dos grupos</h2>
 {chr(10).join(sections)}
     </section>"""
@@ -1090,19 +1145,28 @@ def html_match_section(
     matches: list[dict[str, Any]],
     include_score: bool,
 ) -> str:
+    section_id = match_section_id(title)
     if not matches:
-        return f"""    <section>
+        return f"""    <section id="{escape_html(section_id)}">
       <h2>{escape_html(title)}</h2>
       <p class="empty">Nenhum jogo encontrado no periodo consultado.</p>
     </section>"""
 
     items = "\n".join(html_match_card(match, include_score) for match in matches)
-    return f"""    <section>
+    return f"""    <section id="{escape_html(section_id)}">
       <h2>{escape_html(title)}</h2>
       <div class="matches">
 {items}
       </div>
     </section>"""
+
+
+def match_section_id(title: str) -> str:
+    if title == "Proximos jogos":
+        return "proximos-jogos"
+    if title == "Resultados recentes":
+        return "resultados-recentes"
+    return "jogos"
 
 
 def html_match_card(match: dict[str, Any], include_score: bool) -> str:

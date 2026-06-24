@@ -53,6 +53,38 @@
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
+    .toc {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+    }
+    .toc h2 {
+      margin: 0 0 12px;
+      color: var(--text);
+      text-shadow: none;
+    }
+    .toc-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }
+    .toc-links a {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .toc-links a:hover {
+      background: var(--accent-soft);
+    }
     .card {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -243,11 +275,12 @@
 <body>
   <header>
     <h1>Copa do Mundo 2026 - Dashboard</h1>
-    <p class="meta">Atualizado: 24/06/2026 17:13:33 | Fonte: online | Grupo: Todos</p>
+    <p class="meta">Atualizado: 24/06/2026 17:23:26 | Fonte: online | Grupo: Todos</p>
     <p class="meta">Autor: Vinícius Melo Seixas</p>
   </header>
   <main>
-        <section>
+        <section id="resumo">
+      <h2>Resumo</h2>
       <div class="cards">
       <article class="card">
         <span>Jogos</span>
@@ -267,7 +300,18 @@
       </article>
       </div>
     </section>
-        <section>
+        <nav class="toc" aria-label="Sumario do dashboard">
+      <h2>Sumario</h2>
+      <div class="toc-links">
+        <a href="#resumo">Resumo</a>
+        <a href="#placar-agora">Placar agora</a>
+        <a href="#proximas-etapas">Proximas etapas</a>
+        <a href="#tabela-grupos">Tabela dos grupos</a>
+        <a href="#proximos-jogos">Proximos jogos</a>
+        <a href="#resultados-recentes">Resultados recentes</a>
+      </div>
+    </nav>
+        <section id="placar-agora">
       <h2>Placar agora</h2>
       <div class="live-scoreboards">
         <article class="live-scoreboard">
@@ -288,7 +332,7 @@
             <strong>1</strong>
           </div>
         </div>
-        <div class="live-detail">51&#x27;</div>
+        <div class="live-detail">61&#x27;</div>
       </article>
         <article class="live-scoreboard">
         <div class="live-meta">
@@ -297,10 +341,10 @@
           <span>24/06/2026 16:00</span>
           <span>BC Place</span>
         </div>
-        <div class="live-teams" aria-label="Suíça 1 x 0 Canadá">
+        <div class="live-teams" aria-label="Suíça 2 x 0 Canadá">
           <div class="live-team">
             <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span>
-            <strong>1</strong>
+            <strong>2</strong>
           </div>
           <span class="live-versus">x</span>
           <div class="live-team">
@@ -308,11 +352,11 @@
             <strong>0</strong>
           </div>
         </div>
-        <div class="live-detail">54&#x27;</div>
+        <div class="live-detail">65&#x27;</div>
       </article>
       </div>
     </section>
-        <section>
+        <section id="proximas-etapas">
       <h2>Proximas etapas</h2>
       <div class="table-wrap">
         <table>
@@ -387,7 +431,7 @@
         </table>
       </div>
     </section>
-        <section>
+        <section id="tabela-grupos">
       <h2>Tabela dos grupos</h2>
       <h3>Grupo A</h3>
       <div class="table-wrap">
@@ -1218,7 +1262,7 @@
         </table>
       </div>
     </section>
-        <section>
+        <section id="proximos-jogos">
       <h2>Proximos jogos</h2>
       <div class="matches">
         <article class="match">
@@ -1295,7 +1339,7 @@
         </article>
       </div>
     </section>
-        <section>
+        <section id="resultados-recentes">
       <h2>Resultados recentes</h2>
       <div class="matches">
         <article class="match">
