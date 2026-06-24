@@ -16,7 +16,6 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-
 ESPN_SCOREBOARD_URL = (
     "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard"
 )
@@ -127,6 +126,7 @@ class TeamStats:
     group: str
     name: str
     abbreviation: str
+    logo: str = ""
     played: int = 0
     wins: int = 0
     draws: int = 0
@@ -274,7 +274,10 @@ def load_scoreboard(
         data = fetch_scoreboard(start, end)
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
         if allow_cache and cache_path.exists():
-            return read_cache(cache_path), f"cache ({cache_path}) por falha online: {exc}"
+            return (
+                read_cache(cache_path),
+                f"cache ({cache_path}) por falha online: {exc}",
+            )
         raise SystemExit(f"Falha ao buscar dados online: {exc}") from exc
 
     write_cache(cache_path, data)
@@ -286,7 +289,9 @@ def event_competition(event: dict[str, Any]) -> dict[str, Any]:
     return competitions[0] if competitions else {}
 
 
-def competition_teams(competition: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def competition_teams(
+    competition: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
     competitors = competition.get("competitors") or []
     if len(competitors) < 2:
         raise ValueError("competicao sem dois times")
@@ -337,22 +342,19 @@ def stage_name(event: dict[str, Any], competition: dict[str, Any]) -> str:
 
 
 def is_completed(competition: dict[str, Any]) -> bool:
-    return bool(
-        competition.get("status", {})
-        .get("type", {})
-        .get("completed")
-    )
+    return bool(competition.get("status", {}).get("type", {}).get("completed"))
 
 
 def is_group_stage(competition: dict[str, Any]) -> bool:
     return group_name(competition) != "Sem grupo"
 
 
-def team_identity(competitor: dict[str, Any]) -> tuple[str, str]:
+def team_identity(competitor: dict[str, Any]) -> tuple[str, str, str]:
     team = competitor.get("team") or {}
     name = team.get("displayName") or team.get("name") or "Desconhecido"
     abbreviation = team.get("abbreviation") or name[:3].upper()
-    return translate_team_name(name), abbreviation
+    logo = team.get("logo") or ""
+    return translate_team_name(name), abbreviation, logo
 
 
 def translate_team_name(name: str) -> str:
@@ -371,7 +373,11 @@ def build_group_tables(events: list[dict[str, Any]]) -> dict[str, list[TeamStats
 
     for event in events:
         competition = event_competition(event)
-        if not competition or not is_completed(competition) or not is_group_stage(competition):
+        if (
+            not competition
+            or not is_completed(competition)
+            or not is_group_stage(competition)
+        ):
             continue
 
         try:
@@ -381,11 +387,15 @@ def build_group_tables(events: list[dict[str, Any]]) -> dict[str, list[TeamStats
 
         group = group_name(competition)
         tables.setdefault(group, {})
-        home_name, home_abbr = team_identity(home)
-        away_name, away_abbr = team_identity(away)
+        home_name, home_abbr, home_logo = team_identity(home)
+        away_name, away_abbr, away_logo = team_identity(away)
 
-        tables[group].setdefault(group_key(group, home_name), TeamStats(group, home_name, home_abbr))
-        tables[group].setdefault(group_key(group, away_name), TeamStats(group, away_name, away_abbr))
+        tables[group].setdefault(
+            group_key(group, home_name), TeamStats(group, home_name, home_abbr, home_logo)
+        )
+        tables[group].setdefault(
+            group_key(group, away_name), TeamStats(group, away_name, away_abbr, away_logo)
+        )
 
         home_score = score(home)
         away_score = score(away)
@@ -423,8 +433,8 @@ def normalize_match(event: dict[str, Any]) -> dict[str, Any] | None:
     except ValueError:
         return None
 
-    home_name, home_abbr = team_identity(home)
-    away_name, away_abbr = team_identity(away)
+    home_name, home_abbr, home_logo = team_identity(home)
+    away_name, away_abbr, away_logo = team_identity(away)
     status = competition.get("status", {}).get("type", {})
 
     return {
@@ -434,13 +444,17 @@ def normalize_match(event: dict[str, Any]) -> dict[str, Any] | None:
         "venue": (competition.get("venue") or {}).get("fullName", ""),
         "home": home_name,
         "home_abbr": home_abbr,
+        "home_logo": home_logo,
         "away": away_name,
         "away_abbr": away_abbr,
+        "away_logo": away_logo,
         "home_score": score(home),
         "away_score": score(away),
         "completed": bool(status.get("completed")),
         "state": status.get("state", ""),
-        "detail": status.get("shortDetail") or status.get("detail") or status.get("description", ""),
+        "detail": status.get("shortDetail")
+        or status.get("detail")
+        or status.get("description", ""),
     }
 
 
@@ -451,11 +465,16 @@ def normalized_payload(
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "source": ESPN_SCOREBOARD_URL,
         "tables": {
-            group: [team.__dict__ | {"goal_difference": team.goal_difference} for team in teams]
+            group: [
+                team.__dict__ | {"goal_difference": team.goal_difference}
+                for team in teams
+            ]
             for group, teams in tables.items()
         },
         "matches": [
-            match for match in (normalize_match(event) for event in events) if match is not None
+            match
+            for match in (normalize_match(event) for event in events)
+            if match is not None
         ],
     }
 
@@ -506,7 +525,9 @@ def render(
     events = sorted(data.get("events", []), key=event_datetime)
     tables = build_group_tables(events)
     matches = [
-        match for match in (normalize_match(event) for event in events) if match is not None
+        match
+        for match in (normalize_match(event) for event in events)
+        if match is not None
     ]
     if selected_group:
         group_filter = selected_group.upper()
@@ -523,7 +544,9 @@ def render(
     stage_summaries = build_stage_summaries(matches, now)
 
     lines = dashboard_header(source_label, selected_group)
-    append_dashboard_summary(lines, matches, tables, completed, upcoming, selected_group)
+    append_dashboard_summary(
+        lines, matches, tables, completed, upcoming, selected_group
+    )
     append_stage_dashboard(lines, stage_summaries)
     append_tables(lines, tables, selected_group)
     append_upcoming(lines, upcoming[:upcoming_limit] if upcoming_limit else [])
@@ -544,7 +567,9 @@ def dashboard_view_data(
     events = sorted(data.get("events", []), key=event_datetime)
     tables = build_group_tables(events)
     matches = [
-        match for match in (normalize_match(event) for event in events) if match is not None
+        match
+        for match in (normalize_match(event) for event in events)
+        if match is not None
     ]
     if selected_group:
         group_filter = selected_group.upper()
@@ -576,7 +601,9 @@ def render_html(
     )
     selected = selected_group.upper() if selected_group else None
     visible_tables = {
-        group: teams for group, teams in tables.items() if selected in (None, group.upper())
+        group: teams
+        for group, teams in tables.items()
+        if selected in (None, group.upper())
     }
     leader = best_campaign(visible_tables)
     leader_label = (
@@ -671,6 +698,20 @@ def render_html(
     }}
     tr:last-child td {{ border-bottom: 0; }}
     .team {{ font-weight: 700; }}
+    .team-label {{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }}
+    .team-flag {{
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+      flex: 0 0 22px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+    }}
     .stage {{ color: var(--accent); font-weight: 700; }}
     .status-ok {{ color: var(--green); font-weight: 700; }}
     .status-next {{ color: var(--gold); font-weight: 700; }}
@@ -692,7 +733,14 @@ def render_html(
       font-size: 13px;
       margin-bottom: 6px;
     }}
-    .score {{ font-size: 17px; font-weight: 700; }}
+    .score {{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 17px;
+      font-weight: 700;
+    }}
     .empty {{
       background: var(--panel);
       border: 1px dashed var(--line);
@@ -739,13 +787,10 @@ def html_summary_cards(
         ("Proximos", str(len(upcoming))),
         ("Melhor campanha", leader_label),
     ]
-    items = "\n".join(
-        f"""      <article class="card">
+    items = "\n".join(f"""      <article class="card">
         <span>{escape_html(title)}</span>
         <strong>{escape_html(value)}</strong>
-      </article>"""
-        for title, value in cards
-    )
+      </article>""" for title, value in cards)
     return f"""    <section>
       <div class="cards">
 {items}
@@ -766,17 +811,14 @@ def html_stage_dashboard(summaries: list[StageSummary]) -> str:
       <p class="empty">{escape_html(message)}</p>
     </section>"""
 
-    rows = "\n".join(
-        f"""          <tr>
+    rows = "\n".join(f"""          <tr>
             <td class="stage">{escape_html(summary.stage)}</td>
             <td>{escape_html(format_stage_period(summary))}</td>
             <td>{summary.total}</td>
             <td class="status-ok">{summary.completed}</td>
             <td class="status-next">{summary.upcoming}</td>
             <td>{escape_html(format_stage_highlight(summary))}</td>
-          </tr>"""
-        for summary in pending_stages
-    )
+          </tr>""" for summary in pending_stages)
     return f"""    <section>
       <h2>Proximas etapas</h2>
       <div class="table-wrap">
@@ -808,10 +850,9 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
 
     sections = []
     for group, teams in tables.items():
-        rows = "\n".join(
-            f"""            <tr>
+        rows = "\n".join(f"""            <tr>
               <td>{position}</td>
-              <td class="team">{escape_html(team.name)}</td>
+              <td class="team">{html_team_label(team.name, team.logo)}</td>
               <td>{team.played}</td>
               <td>{team.wins}</td>
               <td>{team.draws}</td>
@@ -820,11 +861,8 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
               <td>{team.goals_against}</td>
               <td>{team.goal_difference:+d}</td>
               <td>{team.points}</td>
-            </tr>"""
-            for position, team in enumerate(teams, start=1)
-        )
-        sections.append(
-            f"""      <h3>Grupo {escape_html(group)}</h3>
+            </tr>""" for position, team in enumerate(teams, start=1))
+        sections.append(f"""      <h3>Grupo {escape_html(group)}</h3>
       <div class="table-wrap">
         <table>
           <thead>
@@ -845,8 +883,7 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
 {rows}
           </tbody>
         </table>
-      </div>"""
-        )
+      </div>""")
 
     return f"""    <section>
       <h2>Tabela dos grupos</h2>
@@ -882,12 +919,22 @@ def html_match_card(match: dict[str, Any], include_score: bool) -> str:
         else str(match.get("stage") or "Mata-mata")
     )
     if include_score:
-        pairing = (
+        pairing_text = (
             f"{match['home']} {match['home_score']} x "
             f"{match['away_score']} {match['away']}"
         )
+        pairing = (
+            f"{html_team_label(match['home'], match.get('home_logo'))} "
+            f"<span>{match['home_score']} x {match['away_score']}</span> "
+            f"{html_team_label(match['away'], match.get('away_logo'))}"
+        )
     else:
-        pairing = f"{match['home']} x {match['away']}"
+        pairing_text = f"{match['home']} x {match['away']}"
+        pairing = (
+            f"{html_team_label(match['home'], match.get('home_logo'))} "
+            f"<span>x</span> "
+            f"{html_team_label(match['away'], match.get('away_logo'))}"
+        )
     venue = match.get("venue") or "Local a definir"
     detail = match.get("detail") or ""
     return f"""        <article class="match">
@@ -896,9 +943,21 @@ def html_match_card(match: dict[str, Any], include_score: bool) -> str:
             <span>{escape_html(stage)}</span>
             <span>{escape_html(venue)}</span>
           </div>
-          <div class="score">{escape_html(pairing)}</div>
+          <div class="score" aria-label="{escape_html(pairing_text)}">{pairing}</div>
           <div>{escape_html(detail)}</div>
         </article>"""
+
+
+def html_team_label(name: object, logo: object = "") -> str:
+    label = escape_html(name)
+    source = str(logo or "").strip()
+    if not source:
+        return f"""<span class="team-label">{label}</span>"""
+    return (
+        f"""<span class="team-label">"""
+        f"""<img class="team-flag" src="{escape_html(source)}" alt="">"""
+        f"""{label}</span>"""
+    )
 
 
 def escape_html(value: object) -> str:
@@ -936,7 +995,9 @@ def append_dashboard_summary(
 ) -> None:
     selected = selected_group.upper() if selected_group else None
     visible_tables = {
-        group: teams for group, teams in tables.items() if selected in (None, group.upper())
+        group: teams
+        for group, teams in tables.items()
+        if selected in (None, group.upper())
     }
     leader = best_campaign(visible_tables)
     leader_label = (
@@ -950,18 +1011,16 @@ def append_dashboard_summary(
     ]
 
     lines.append("Resumo")
-    lines.append("+----------------------+----------------------+----------------------+----------------------+")
     lines.append(
-        "| "
-        + " | ".join(f"{title:<20}" for title, _ in cards)
-        + " |"
+        "+----------------------+----------------------+----------------------+----------------------+"
+    )
+    lines.append("| " + " | ".join(f"{title:<20}" for title, _ in cards) + " |")
+    lines.append(
+        "| " + " | ".join(f"{fit_text(value, 20):<20}" for _, value in cards) + " |"
     )
     lines.append(
-        "| "
-        + " | ".join(f"{fit_text(value, 20):<20}" for _, value in cards)
-        + " |"
+        "+----------------------+----------------------+----------------------+----------------------+"
     )
-    lines.append("+----------------------+----------------------+----------------------+----------------------+")
     lines.append("")
 
 
@@ -971,15 +1030,23 @@ def append_stage_dashboard(lines: list[str], summaries: list[StageSummary]) -> N
 
     if not pending_stages:
         if summaries:
-            lines.append("Todas as etapas encontradas no periodo consultado ja foram encerradas.")
+            lines.append(
+                "Todas as etapas encontradas no periodo consultado ja foram encerradas."
+            )
         else:
             lines.append("Nenhuma etapa encontrada no periodo consultado.")
         lines.append("")
         return
 
-    lines.append("+----------------------+-------------+-------+-----------+----------+----------------------------+")
-    lines.append("| Etapa                | Periodo     | Jogos | Encerr.   | Prox.    | Destaque                   |")
-    lines.append("+----------------------+-------------+-------+-----------+----------+----------------------------+")
+    lines.append(
+        "+----------------------+-------------+-------+-----------+----------+----------------------------+"
+    )
+    lines.append(
+        "| Etapa                | Periodo     | Jogos | Encerr.   | Prox.    | Destaque                   |"
+    )
+    lines.append(
+        "+----------------------+-------------+-------+-----------+----------+----------------------------+"
+    )
     for summary in pending_stages:
         lines.append(
             f"| {fit_text(summary.stage, 20):<20} "
@@ -989,7 +1056,9 @@ def append_stage_dashboard(lines: list[str], summaries: list[StageSummary]) -> N
             f"| {summary.upcoming:>8} "
             f"| {fit_text(format_stage_highlight(summary), 26):<26} |"
         )
-    lines.append("+----------------------+-------------+-------+-----------+----------+----------------------------+")
+    lines.append(
+        "+----------------------+-------------+-------+-----------+----------+----------------------------+"
+    )
     lines.append("")
 
 
@@ -998,7 +1067,10 @@ def format_stage_period(summary: StageSummary) -> str:
         return "-"
 
     first = summary.first_date.astimezone().strftime("%d/%m")
-    if summary.last_date is None or summary.last_date.date() == summary.first_date.date():
+    if (
+        summary.last_date is None
+        or summary.last_date.date() == summary.first_date.date()
+    ):
         return first
     last = summary.last_date.astimezone().strftime("%d/%m")
     return f"{first}-{last}"
@@ -1027,7 +1099,9 @@ def append_tables(
 ) -> None:
     selected = selected_group.upper() if selected_group else None
     groups = {
-        group: teams for group, teams in tables.items() if selected in (None, group.upper())
+        group: teams
+        for group, teams in tables.items()
+        if selected in (None, group.upper())
     }
 
     if not groups:
@@ -1039,9 +1113,15 @@ def append_tables(
     append_section_title(lines, "Tabela dos grupos")
     for group, teams in groups.items():
         lines.append(f"Grupo {group}")
-        lines.append("+-----+----------------------+----+----+----+----+----+----+-----+-----+")
-        lines.append("| Pos | Time                 | J  | V  | E  | D  | GP | GC | SG  | Pts |")
-        lines.append("+-----+----------------------+----+----+----+----+----+----+-----+-----+")
+        lines.append(
+            "+-----+----------------------+----+----+----+----+----+----+-----+-----+"
+        )
+        lines.append(
+            "| Pos | Time                 | J  | V  | E  | D  | GP | GC | SG  | Pts |"
+        )
+        lines.append(
+            "+-----+----------------------+----+----+----+----+----+----+-----+-----+"
+        )
         for position, team in enumerate(teams, start=1):
             lines.append(
                 f"| {position:>3} | {fit_text(team.name, 20):<20} "
@@ -1049,7 +1129,9 @@ def append_tables(
                 f"{team.losses:>2} | {team.goals_for:>2} | {team.goals_against:>2} | "
                 f"{team.goal_difference:>+3} | {team.points:>3} |"
             )
-        lines.append("+-----+----------------------+----+----+----+----+----+----+-----+-----+")
+        lines.append(
+            "+-----+----------------------+----+----+----+----+----+----+-----+-----+"
+        )
         lines.append("")
     lines.append("")
 
@@ -1120,11 +1202,14 @@ def run_once(args: argparse.Namespace) -> str:
     tables = build_group_tables(events)
 
     if args.json:
-        return json.dumps(
-            normalized_payload(events, tables),
-            ensure_ascii=False,
-            indent=2,
-        ) + "\n"
+        return (
+            json.dumps(
+                normalized_payload(events, tables),
+                ensure_ascii=False,
+                indent=2,
+            )
+            + "\n"
+        )
 
     if args.html:
         html_path = write_html_dashboard(

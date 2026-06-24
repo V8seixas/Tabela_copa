@@ -21,6 +21,8 @@ def event(
     completed=True,
     date="2026-06-11T20:00Z",
     note=None,
+    home_logo="",
+    away_logo="",
 ):
     game_note = note if note is not None else f"FIFA World Cup, Group {group}"
     return {
@@ -34,12 +36,20 @@ def event(
                     {
                         "homeAway": "home",
                         "score": str(home_score),
-                        "team": {"displayName": home, "abbreviation": home[:3].upper()},
+                        "team": {
+                            "displayName": home,
+                            "abbreviation": home[:3].upper(),
+                            "logo": home_logo,
+                        },
                     },
                     {
                         "homeAway": "away",
                         "score": str(away_score),
-                        "team": {"displayName": away, "abbreviation": away[:3].upper()},
+                        "team": {
+                            "displayName": away,
+                            "abbreviation": away[:3].upper(),
+                            "logo": away_logo,
+                        },
                     },
                 ],
             }
@@ -77,12 +87,22 @@ class Copa2026Tests(unittest.TestCase):
         self.assertEqual(table[0].played, 1)
 
     def test_normalize_match_keeps_score_and_group(self):
-        match = normalize_match(event("K", "Portugal", "Uzbekistan", 5, 0))
+        match = normalize_match(
+            event(
+                "K",
+                "Portugal",
+                "Uzbekistan",
+                5,
+                0,
+                away_logo="https://example.com/uzb.png",
+            )
+        )
 
         self.assertEqual(match["group"], "K")
         self.assertEqual(match["stage"], "Fase de grupos")
         self.assertEqual(match["home"], "Portugal")
         self.assertEqual(match["away"], "Uzbequistão")
+        self.assertEqual(match["away_logo"], "https://example.com/uzb.png")
         self.assertEqual(match["away_score"], 0)
         self.assertIs(match["completed"], True)
 
@@ -175,6 +195,28 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Fase de 32", content)
         self.assertIn("Brasil 2 x 0 Canadá", content)
         self.assertIn("Autor: Vinícius Melo Seixas", content)
+
+    def test_render_html_shows_team_flags_when_available(self):
+        data = {
+            "events": [
+                event(
+                    "A",
+                    "Brazil",
+                    "Canada",
+                    2,
+                    0,
+                    completed=True,
+                    home_logo="https://example.com/bra.png",
+                    away_logo="https://example.com/can.png",
+                ),
+            ]
+        }
+
+        content = render_html(data, "teste", None, recent_limit=5, upcoming_limit=5)
+
+        self.assertIn('class="team-flag"', content)
+        self.assertIn('src="https://example.com/bra.png"', content)
+        self.assertIn('src="https://example.com/can.png"', content)
 
     def test_write_html_dashboard_creates_file(self):
         with TemporaryDirectory() as tmpdir:
