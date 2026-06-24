@@ -23,6 +23,7 @@ TOURNAMENT_START = date(2026, 6, 11)
 TOURNAMENT_END = date(2026, 7, 19)
 DEFAULT_CACHE = Path(".cache/copa2026-scoreboard.json")
 AUTHOR = "Vinícius Melo Seixas"
+DASHBOARD_BACKGROUND_IMAGE = "picture_cup_2026_1.png"
 TEAM_NAME_TRANSLATIONS = {
     "Albania": "Albânia",
     "Algeria": "Argélia",
@@ -622,7 +623,7 @@ def render_html(
     :root {{
       color-scheme: light;
       --bg: #f5f7fb;
-      --panel: #ffffff;
+      --panel: rgba(255, 255, 255, 0.93);
       --text: #1b2430;
       --muted: #667085;
       --line: #d8dee9;
@@ -634,15 +635,20 @@ def render_html(
     * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
-      background: var(--bg);
+      min-height: 100vh;
+      background:
+        linear-gradient(rgba(5, 10, 24, 0.58), rgba(5, 10, 24, 0.72)),
+        url("{escape_html(DASHBOARD_BACKGROUND_IMAGE)}") center top / cover fixed no-repeat,
+        var(--bg);
       color: var(--text);
       font-family: Arial, Helvetica, sans-serif;
       line-height: 1.4;
     }}
     header {{
-      background: #0f172a;
+      background: rgba(15, 23, 42, 0.88);
       color: #ffffff;
       padding: 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
     }}
     main {{
       width: min(1180px, calc(100% - 32px));
@@ -650,6 +656,10 @@ def render_html(
     }}
     h1, h2, h3, p {{ margin-top: 0; }}
     h1 {{ margin-bottom: 8px; font-size: 28px; }}
+    h2, h3 {{
+      color: #ffffff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+    }}
     h2 {{ margin: 28px 0 12px; font-size: 22px; }}
     h3 {{ margin: 18px 0 10px; font-size: 18px; }}
     .meta {{ color: #d7dce6; margin: 0; }}
@@ -663,6 +673,7 @@ def render_html(
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
     }}
     .card span {{
       display: block;
@@ -676,6 +687,7 @@ def render_html(
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
     }}
     table {{
       width: 100%;
@@ -724,6 +736,7 @@ def render_html(
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px 14px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
     }}
     .match-top {{
       display: flex;
@@ -751,8 +764,9 @@ def render_html(
     footer {{
       width: min(1180px, calc(100% - 32px));
       margin: 0 auto 28px;
-      color: var(--muted);
+      color: rgba(255, 255, 255, 0.82);
       font-size: 13px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
     }}
   </style>
 </head>

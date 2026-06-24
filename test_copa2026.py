@@ -195,6 +195,7 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Fase de 32", content)
         self.assertIn("Brasil 2 x 0 Canadá", content)
         self.assertIn("Autor: Vinícius Melo Seixas", content)
+        self.assertIn('url("picture_cup_2026_1.png")', content)
 
     def test_render_html_shows_team_flags_when_available(self):
         data = {
