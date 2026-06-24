@@ -392,10 +392,12 @@ def build_group_tables(events: list[dict[str, Any]]) -> dict[str, list[TeamStats
         away_name, away_abbr, away_logo = team_identity(away)
 
         tables[group].setdefault(
-            group_key(group, home_name), TeamStats(group, home_name, home_abbr, home_logo)
+            group_key(group, home_name),
+            TeamStats(group, home_name, home_abbr, home_logo),
         )
         tables[group].setdefault(
-            group_key(group, away_name), TeamStats(group, away_name, away_abbr, away_logo)
+            group_key(group, away_name),
+            TeamStats(group, away_name, away_abbr, away_logo),
         )
 
         home_score = score(home)
@@ -623,7 +625,7 @@ def render_html(
     :root {{
       color-scheme: light;
       --bg: #f5f7fb;
-      --panel: rgba(255, 255, 255, 0.93);
+      --panel: rgba(255, 255, 255, 0.80);
       --text: #1b2430;
       --muted: #667085;
       --line: #d8dee9;
