@@ -139,12 +139,97 @@
       font-size: 17px;
       font-weight: 700;
     }
+    .live-scoreboard {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(9, 105, 218, 0.32);
+      border-left: 6px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22);
+    }
+    .live-scoreboards {
+      display: grid;
+      gap: 12px;
+    }
+    .live-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #d92d20;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .live-teams {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+    }
+    .live-team {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+    .live-team .team-label {
+      min-width: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .live-team strong {
+      flex: 0 0 auto;
+      min-width: 44px;
+      text-align: center;
+      font-size: 34px;
+      line-height: 1;
+      color: var(--accent);
+    }
+    .live-versus {
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .live-detail {
+      margin-top: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
     .empty {
       background: var(--panel);
       border: 1px dashed var(--line);
       border-radius: 8px;
       padding: 16px;
       color: var(--muted);
+    }
+    @media (max-width: 700px) {
+      .live-teams {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .live-versus {
+        display: none;
+      }
+      .live-team {
+        padding: 10px 0;
+        border-top: 1px solid var(--line);
+      }
+      .live-team:first-child {
+        border-top: 0;
+      }
     }
     footer {
       width: min(1180px, calc(100% - 32px));
@@ -158,7 +243,7 @@
 <body>
   <header>
     <h1>Copa do Mundo 2026 - Dashboard</h1>
-    <p class="meta">Atualizado: 24/06/2026 13:58:42 | Fonte: online | Grupo: Todos</p>
+    <p class="meta">Atualizado: 24/06/2026 17:13:33 | Fonte: online | Grupo: Todos</p>
     <p class="meta">Autor: Vinícius Melo Seixas</p>
   </header>
   <main>
@@ -174,11 +259,56 @@
       </article>
       <article class="card">
         <span>Proximos</span>
-        <strong>56</strong>
+        <strong>54</strong>
       </article>
       <article class="card">
         <span>Melhor campanha</span>
         <strong>Alemanha (6 pts)</strong>
+      </article>
+      </div>
+    </section>
+        <section>
+      <h2>Placar agora</h2>
+      <div class="live-scoreboards">
+        <article class="live-scoreboard">
+        <div class="live-meta">
+          <span class="live-badge">Agora</span>
+          <span>Grupo B</span>
+          <span>24/06/2026 16:00</span>
+          <span>Lumen Field</span>
+        </div>
+        <div class="live-teams" aria-label="Bósnia e Herzegovina 2 x 1 Catar">
+          <div class="live-team">
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bósnia e Herzegovina</span>
+            <strong>2</strong>
+          </div>
+          <span class="live-versus">x</span>
+          <div class="live-team">
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/qat.png" alt="">Catar</span>
+            <strong>1</strong>
+          </div>
+        </div>
+        <div class="live-detail">51&#x27;</div>
+      </article>
+        <article class="live-scoreboard">
+        <div class="live-meta">
+          <span class="live-badge">Agora</span>
+          <span>Grupo B</span>
+          <span>24/06/2026 16:00</span>
+          <span>BC Place</span>
+        </div>
+        <div class="live-teams" aria-label="Suíça 1 x 0 Canadá">
+          <div class="live-team">
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span>
+            <strong>1</strong>
+          </div>
+          <span class="live-versus">x</span>
+          <div class="live-team">
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span>
+            <strong>0</strong>
+          </div>
+        </div>
+        <div class="live-detail">54&#x27;</div>
       </article>
       </div>
     </section>
@@ -202,8 +332,8 @@
             <td>11/06-27/06</td>
             <td>72</td>
             <td class="status-ok">48</td>
-            <td class="status-next">24</td>
-            <td>24/06 16:00 Bosnia-Herzegovina x Catar</td>
+            <td class="status-next">22</td>
+            <td>24/06 19:00 Marrocos x Haiti</td>
           </tr>
           <tr>
             <td class="stage">Fase de 32</td>
@@ -372,7 +502,7 @@
             </tr>
             <tr>
               <td>3</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bosnia-Herzegovina</span></td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bósnia e Herzegovina</span></td>
               <td>2</td>
               <td>0</td>
               <td>1</td>
@@ -1093,24 +1223,6 @@
       <div class="matches">
         <article class="match">
           <div class="match-top">
-            <span>24/06/2026 16:00</span>
-            <span>Grupo B</span>
-            <span>Lumen Field</span>
-          </div>
-          <div class="score" aria-label="Bosnia-Herzegovina x Catar"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bosnia-Herzegovina</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/qat.png" alt="">Catar</span></div>
-          <div>Scheduled</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>24/06/2026 16:00</span>
-            <span>Grupo B</span>
-            <span>BC Place</span>
-          </div>
-          <div class="score" aria-label="Suíça x Canadá"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span></div>
-          <div>Scheduled</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
             <span>24/06/2026 19:00</span>
             <span>Grupo C</span>
             <span>Mercedes-Benz Stadium</span>
@@ -1161,6 +1273,24 @@
             <span>MetLife Stadium</span>
           </div>
           <div class="score" aria-label="Equador x Alemanha"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span></div>
+          <div>Scheduled</div>
+        </article>
+        <article class="match">
+          <div class="match-top">
+            <span>25/06/2026 20:00</span>
+            <span>Grupo F</span>
+            <span>AT&amp;T Stadium</span>
+          </div>
+          <div class="score" aria-label="Japão x Suécia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span></div>
+          <div>Scheduled</div>
+        </article>
+        <article class="match">
+          <div class="match-top">
+            <span>25/06/2026 20:00</span>
+            <span>Grupo F</span>
+            <span>GEHA Field at Arrowhead Stadium</span>
+          </div>
+          <div class="score" aria-label="Tunísia x Países Baixos"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/tun.png" alt="">Tunísia</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ned.png" alt="">Países Baixos</span></div>
           <div>Scheduled</div>
         </article>
       </div>

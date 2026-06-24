@@ -34,6 +34,7 @@ TEAM_NAME_TRANSLATIONS = {
     "Belgium": "Bélgica",
     "Bolivia": "Bolívia",
     "Bosnia and Herzegovina": "Bósnia e Herzegovina",
+    "Bosnia-Herzegovina": "Bósnia e Herzegovina",
     "Brazil": "Brasil",
     "Bulgaria": "Bulgária",
     "Burkina Faso": "Burkina Faso",
@@ -591,6 +592,44 @@ def dashboard_view_data(
     return tables, matches, completed, upcoming, stage_summaries
 
 
+def live_matches(matches: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        match
+        for match in matches
+        if not match["completed"] and str(match.get("state", "")).lower() == "in"
+    ]
+
+
+def current_matches(
+    matches: list[dict[str, Any]], now: datetime | None = None
+) -> list[dict[str, Any]]:
+    reference = now or datetime.now(timezone.utc)
+    active = [
+        match
+        for match in matches
+        if not match["completed"]
+        and (
+            str(match.get("state", "")).lower() == "in"
+            or datetime.fromisoformat(match["date"]) <= reference
+        )
+    ]
+    return sorted(
+        active,
+        key=lambda match: (
+            datetime.fromisoformat(match["date"]),
+            str(match.get("home") or ""),
+            str(match.get("away") or ""),
+        ),
+    )
+
+
+def current_match(
+    matches: list[dict[str, Any]], now: datetime | None = None
+) -> dict[str, Any] | None:
+    active = current_matches(matches, now)
+    return active[0] if active else None
+
+
 def render_html(
     data: dict[str, Any],
     source_label: str,
@@ -612,6 +651,7 @@ def render_html(
     leader_label = (
         f"{leader.name} ({leader.points} pts)" if leader is not None else "Sem dados"
     )
+    live_matches_now = current_matches(matches)
     updated = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     group_label = selected_group.upper() if selected_group else "Todos"
 
@@ -756,12 +796,97 @@ def render_html(
       font-size: 17px;
       font-weight: 700;
     }}
+    .live-scoreboard {{
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(9, 105, 218, 0.32);
+      border-left: 6px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22);
+    }}
+    .live-scoreboards {{
+      display: grid;
+      gap: 12px;
+    }}
+    .live-meta {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }}
+    .live-badge {{
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: #d92d20;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }}
+    .live-teams {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 14px;
+    }}
+    .live-team {{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }}
+    .live-team .team-label {{
+      min-width: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }}
+    .live-team strong {{
+      flex: 0 0 auto;
+      min-width: 44px;
+      text-align: center;
+      font-size: 34px;
+      line-height: 1;
+      color: var(--accent);
+    }}
+    .live-versus {{
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 700;
+    }}
+    .live-detail {{
+      margin-top: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }}
     .empty {{
       background: var(--panel);
       border: 1px dashed var(--line);
       border-radius: 8px;
       padding: 16px;
       color: var(--muted);
+    }}
+    @media (max-width: 700px) {{
+      .live-teams {{
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }}
+      .live-versus {{
+        display: none;
+      }}
+      .live-team {{
+        padding: 10px 0;
+        border-top: 1px solid var(--line);
+      }}
+      .live-team:first-child {{
+        border-top: 0;
+      }}
     }}
     footer {{
       width: min(1180px, calc(100% - 32px));
@@ -780,6 +905,7 @@ def render_html(
   </header>
   <main>
     {html_summary_cards(matches, completed, upcoming, leader_label)}
+    {html_live_scoreboard(live_matches_now)}
     {html_stage_dashboard(stage_summaries)}
     {html_group_tables(visible_tables)}
     {html_match_section("Proximos jogos", upcoming[:upcoming_limit] if upcoming_limit else [], include_score=False)}
@@ -812,6 +938,58 @@ def html_summary_cards(
 {items}
       </div>
     </section>"""
+
+
+def html_live_scoreboard(matches: list[dict[str, Any]]) -> str:
+    if not matches:
+        return """    <section>
+      <h2>Placar agora</h2>
+      <p class="empty">Nenhum jogo em andamento agora.</p>
+    </section>"""
+
+    items = "\n".join(html_live_match_card(match) for match in matches)
+    return f"""    <section>
+      <h2>Placar agora</h2>
+      <div class="live-scoreboards">
+{items}
+      </div>
+    </section>"""
+
+
+def html_live_match_card(match: dict[str, Any]) -> str:
+    when = datetime.fromisoformat(match["date"]).astimezone().strftime("%d/%m/%Y %H:%M")
+    stage = (
+        f"Grupo {match['group']}"
+        if match["group"] != "Sem grupo"
+        else str(match.get("stage") or "Mata-mata")
+    )
+    venue = match.get("venue") or "Local a definir"
+    detail = match.get("detail") or "Em andamento"
+    pairing_text = (
+        f"{match['home']} {match['home_score']} x "
+        f"{match['away_score']} {match['away']}"
+    )
+    return f"""        <article class="live-scoreboard">
+        <div class="live-meta">
+          <span class="live-badge">Agora</span>
+          <span>{escape_html(stage)}</span>
+          <span>{escape_html(when)}</span>
+          <span>{escape_html(venue)}</span>
+        </div>
+        <div class="live-teams" aria-label="{escape_html(pairing_text)}">
+          {html_live_team(match["home"], match.get("home_logo"), match["home_score"])}
+          <span class="live-versus">x</span>
+          {html_live_team(match["away"], match.get("away_logo"), match["away_score"])}
+        </div>
+        <div class="live-detail">{escape_html(detail)}</div>
+      </article>"""
+
+
+def html_live_team(name: object, logo: object, goals: object) -> str:
+    return f"""<div class="live-team">
+            {html_team_label(name, logo)}
+            <strong>{escape_html(goals)}</strong>
+          </div>"""
 
 
 def html_stage_dashboard(summaries: list[StageSummary]) -> str:

@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from copa2026 import (
     build_group_tables,
     build_stage_summaries,
+    current_matches,
     normalize_match,
     render_html,
     write_html_dashboard,
@@ -23,15 +24,27 @@ def event(
     note=None,
     home_logo="",
     away_logo="",
+    state=None,
+    detail=None,
 ):
     game_note = note if note is not None else f"FIFA World Cup, Group {group}"
+    status_state = state if state is not None else ("post" if completed else "pre")
+    status_detail = (
+        detail if detail is not None else ("FT" if completed else "Pré-jogo")
+    )
     return {
         "date": date,
         "name": f"{home} vs {away}",
         "competitions": [
             {
                 "altGameNote": game_note,
-                "status": {"type": {"completed": completed, "shortDetail": "FT"}},
+                "status": {
+                    "type": {
+                        "completed": completed,
+                        "state": status_state,
+                        "shortDetail": status_detail,
+                    }
+                },
                 "competitors": [
                     {
                         "homeAway": "home",
@@ -196,6 +209,7 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Brasil 2 x 0 Canadá", content)
         self.assertIn("Autor: Vinícius Melo Seixas", content)
         self.assertIn('url("picture_cup_2026_1.png")', content)
+        self.assertIn("Placar agora", content)
 
     def test_render_html_shows_team_flags_when_available(self):
         data = {
@@ -218,6 +232,81 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn('class="team-flag"', content)
         self.assertIn('src="https://example.com/bra.png"', content)
         self.assertIn('src="https://example.com/can.png"', content)
+
+    def test_current_matches_include_live_and_started_matches(self):
+        matches = [
+            normalize_match(
+                event(
+                    "A",
+                    "Brazil",
+                    "Canada",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-06-24T15:00Z",
+                )
+            ),
+            normalize_match(
+                event(
+                    "B",
+                    "Argentina",
+                    "France",
+                    1,
+                    0,
+                    completed=False,
+                    date="2026-06-24T16:00Z",
+                    state="in",
+                    detail="35'",
+                )
+            ),
+        ]
+
+        active = current_matches(
+            [item for item in matches if item is not None],
+            datetime(2026, 6, 24, 16, 30, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([match["home"] for match in active], ["Brasil", "Argentina"])
+        self.assertEqual(active[1]["detail"], "35'")
+
+    def test_render_html_shows_all_current_scoreboards(self):
+        data = {
+            "events": [
+                event(
+                    "B",
+                    "Argentina",
+                    "France",
+                    2,
+                    1,
+                    completed=False,
+                    date="2026-06-24T16:00Z",
+                    state="in",
+                    detail="70'",
+                    home_logo="https://example.com/arg.png",
+                    away_logo="https://example.com/fra.png",
+                ),
+                event(
+                    "B",
+                    "Switzerland",
+                    "Canada",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-06-24T16:00Z",
+                    detail="Scheduled",
+                    home_logo="https://example.com/sui.png",
+                    away_logo="https://example.com/can.png",
+                ),
+            ]
+        }
+
+        content = render_html(data, "teste", None, recent_limit=5, upcoming_limit=5)
+
+        self.assertIn("Placar agora", content)
+        self.assertIn("Argentina 2 x 1 França", content)
+        self.assertIn("Suíça 0 x 0 Canadá", content)
+        self.assertIn('class="live-badge">Agora</span>', content)
+        self.assertIn("70&#x27;", content)
 
     def test_write_html_dashboard_creates_file(self):
         with TemporaryDirectory() as tmpdir:
