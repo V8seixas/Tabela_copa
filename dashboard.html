@@ -247,6 +247,197 @@
       padding: 16px;
       color: var(--muted);
     }
+
+    .knockout-bracket {
+      margin-top: 28px;
+      padding: 18px;
+      overflow: hidden;
+      background: rgba(7, 17, 35, 0.92);
+      border: 1px solid rgba(125, 211, 252, 0.36);
+      border-radius: 8px;
+      box-shadow: 0 18px 42px rgba(3, 10, 28, 0.34);
+    }
+    .knockout-bracket h2 {
+      margin-bottom: 6px;
+    }
+    .bracket-note {
+      margin: 0 0 16px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+    .bracket-scroll {
+      overflow-x: auto;
+      padding: 4px 2px 10px;
+    }
+    .bracket-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(178px, 1fr)) minmax(220px, 1.1fr) repeat(4, minmax(178px, 1fr));
+      gap: 14px;
+      min-width: 1680px;
+      align-items: center;
+    }
+    .bracket-round {
+      display: grid;
+      align-content: center;
+      gap: 10px;
+      min-height: 100%;
+    }
+    .bracket-round-title {
+      min-height: 28px;
+      color: #bae6fd;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .bracket-match {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      min-height: 118px;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.90);
+      border: 1px solid rgba(96, 165, 250, 0.38);
+      border-radius: 8px;
+      color: #f8fafc;
+      box-shadow: 0 0 18px rgba(37, 99, 235, 0.16);
+    }
+    .bracket-round.left .bracket-match::after,
+    .bracket-final-card::before,
+    .bracket-round.right .bracket-match::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 14px;
+      border-top: 1px solid rgba(125, 211, 252, 0.48);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
+    }
+    .bracket-round.left .bracket-match::after {
+      right: -15px;
+    }
+    .bracket-round.right .bracket-match::before {
+      left: -15px;
+    }
+    .bracket-final-card::before {
+      left: -15px;
+    }
+    .bracket-final-card::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      width: 14px;
+      border-top: 1px solid rgba(125, 211, 252, 0.48);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
+    }
+    .bracket-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bracket-team {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      padding: 5px 0;
+      border-top: 1px solid rgba(148, 163, 184, 0.20);
+    }
+    .bracket-team:first-of-type {
+      border-top: 0;
+    }
+    .bracket-team .team-label {
+      min-width: 0;
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .bracket-team .team-label img {
+      flex: 0 0 20px;
+    }
+    .bracket-team.winner .team-label,
+    .bracket-team.winner .bracket-score {
+      color: #86efac;
+    }
+    .bracket-score {
+      min-width: 28px;
+      color: #dbeafe;
+      font-weight: 900;
+      text-align: right;
+    }
+    .bracket-status {
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .bracket-placeholder {
+      display: grid;
+      min-height: 92px;
+      place-items: center;
+      padding: 12px;
+      color: #94a3b8;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.44);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .bracket-center {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+    .bracket-final-card,
+    .bracket-champion {
+      position: relative;
+      border-radius: 8px;
+    }
+    .bracket-final-card {
+      border: 1px solid rgba(250, 204, 21, 0.54);
+      box-shadow: 0 0 22px rgba(250, 204, 21, 0.14);
+    }
+    .bracket-champion {
+      display: grid;
+      min-height: 112px;
+      place-items: center;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(88, 62, 9, 0.70));
+      border: 1px solid rgba(250, 204, 21, 0.62);
+      color: #fef3c7;
+      text-align: center;
+      box-shadow: 0 0 26px rgba(250, 204, 21, 0.16);
+    }
+    .bracket-champion span {
+      display: block;
+      color: #fde68a;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .bracket-champion strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+    @media (max-width: 700px) {
+      .knockout-bracket {
+        padding: 14px;
+      }
+      .bracket-grid {
+        min-width: 1540px;
+        grid-template-columns: repeat(4, 164px) 204px repeat(4, 164px);
+        gap: 10px;
+      }
+    }
     @media (max-width: 700px) {
       .live-teams {
         grid-template-columns: 1fr;
@@ -275,7 +466,7 @@
 <body>
   <header>
     <h1>Copa do Mundo 2026 - Dashboard</h1>
-    <p class="meta">Atualizado: 24/06/2026 22:41:35 | Fonte: online | Grupo: Todos</p>
+    <p class="meta">Atualizado: 25/06/2026 11:05:06 | Fonte: online | Grupo: Todos</p>
     <p class="meta">Autor: Vinícius Melo Seixas</p>
   </header>
   <main>
@@ -288,7 +479,7 @@
       </article>
       <article class="card">
         <span>Encerrados</span>
-        <strong>52</strong>
+        <strong>54</strong>
       </article>
       <article class="card">
         <span>Proximos</span>
@@ -296,7 +487,7 @@
       </article>
       <article class="card">
         <span>Melhor campanha</span>
-        <strong>Brasil (7 pts)</strong>
+        <strong>México (9 pts)</strong>
       </article>
       </div>
     </section>
@@ -306,6 +497,7 @@
         <a href="#resumo">Resumo</a>
         <a href="#placar-agora">Placar agora</a>
         <a href="#proximas-etapas">Proximas etapas</a>
+        <a href="#chaveamento">Chaveamento</a>
         <a href="#tabela-grupos">Tabela dos grupos</a>
         <a href="#proximos-jogos">Proximos jogos</a>
         <a href="#resultados-recentes">Resultados recentes</a>
@@ -313,48 +505,7 @@
     </nav>
         <section id="placar-agora">
       <h2>Placar agora</h2>
-      <div class="live-scoreboards">
-        <article class="live-scoreboard">
-        <div class="live-meta">
-          <span class="live-badge">Agora</span>
-          <span>Grupo A</span>
-          <span>24/06/2026 22:00</span>
-          <span>Estadio Banorte</span>
-        </div>
-        <div class="live-teams" aria-label="Tchéquia 0 x 0 México">
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span>
-            <strong>0</strong>
-          </div>
-          <span class="live-versus">x</span>
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span>
-            <strong>0</strong>
-          </div>
-        </div>
-        <div class="live-detail">41&#x27;</div>
-      </article>
-        <article class="live-scoreboard">
-        <div class="live-meta">
-          <span class="live-badge">Agora</span>
-          <span>Grupo A</span>
-          <span>24/06/2026 22:00</span>
-          <span>Estadio BBVA</span>
-        </div>
-        <div class="live-teams" aria-label="África do Sul 0 x 0 South Korea">
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span>
-            <strong>0</strong>
-          </div>
-          <span class="live-versus">x</span>
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">South Korea</span>
-            <strong>0</strong>
-          </div>
-        </div>
-        <div class="live-detail">41&#x27;</div>
-      </article>
-      </div>
+      <p class="empty">Nenhum jogo em andamento agora.</p>
     </section>
         <section id="proximas-etapas">
       <h2>Proximas etapas</h2>
@@ -375,12 +526,20 @@
             <td class="stage">Fase de grupos</td>
             <td>11/06-27/06</td>
             <td>72</td>
-            <td class="status-ok">52</td>
+            <td class="status-ok">54</td>
             <td class="status-next">18</td>
             <td>25/06 17:00 Curaçao x Costa do Marfim</td>
           </tr>
           <tr>
             <td class="stage">Fase de 32</td>
+            <td>28/06-03/07</td>
+            <td>16</td>
+            <td class="status-ok">0</td>
+            <td class="status-next">16</td>
+            <td>28/06 16:00 África do Sul x Canadá</td>
+          </tr>
+          <tr>
+            <td class="stage">Oitavas de final</td>
             <td>04/07-07/07</td>
             <td>8</td>
             <td class="status-ok">0</td>
@@ -388,7 +547,7 @@
             <td>04/07 14:00 Round of 32 1 Winner x Round of 32 3 Winner</td>
           </tr>
           <tr>
-            <td class="stage">Oitavas de final</td>
+            <td class="stage">Quartas de final</td>
             <td>09/07-11/07</td>
             <td>4</td>
             <td class="status-ok">0</td>
@@ -396,7 +555,7 @@
             <td>09/07 17:00 Round of 16 1 Winner x Round of 16 2 Winner</td>
           </tr>
           <tr>
-            <td class="stage">Quartas de final</td>
+            <td class="stage">Semifinais</td>
             <td>14/07-15/07</td>
             <td>2</td>
             <td class="status-ok">0</td>
@@ -404,23 +563,529 @@
             <td>14/07 16:00 Quarterfinal 1 Winner x Quarterfinal 2 Winner</td>
           </tr>
           <tr>
-            <td class="stage">Semifinais</td>
-            <td>18/07-19/07</td>
-            <td>2</td>
+            <td class="stage">Disputa de 3o lugar</td>
+            <td>18/07</td>
+            <td>1</td>
             <td class="status-ok">0</td>
-            <td class="status-next">2</td>
+            <td class="status-next">1</td>
             <td>18/07 18:00 Semifinal 1 Loser x Semifinal 2 Loser</td>
           </tr>
           <tr>
-            <td class="stage">Mata-mata</td>
-            <td>28/06-03/07</td>
-            <td>16</td>
+            <td class="stage">Final</td>
+            <td>19/07</td>
+            <td>1</td>
             <td class="status-ok">0</td>
-            <td class="status-next">16</td>
-            <td>28/06 16:00 Group A 2nd Place x Canadá</td>
+            <td class="status-next">1</td>
+            <td>19/07 16:00 Semifinal 1 Winner x Semifinal 2 Winner</td>
           </tr>
           </tbody>
         </table>
+      </div>
+    </section>
+        <section id="chaveamento" class="knockout-bracket">
+      <h2>Chaveamento</h2>
+      <p class="bracket-note">Mata-mata organizado em dois lados que convergem para a final e o campeao.</p>
+      <div class="bracket-scroll" aria-label="Chaveamento do mata-mata da Copa do Mundo">
+        <div class="bracket-grid">
+          <div class="bracket-round left">
+            <div class="bracket-round-title">Fase de 32</div>
+          <article class="bracket-match " aria-label="África do Sul x Canadá">
+            <div class="bracket-meta">
+              <span>28/06 16:00</span>
+              <span>SoFi Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Brasil x Group F 2nd Place">
+            <div class="bracket-meta">
+              <span>29/06 14:00</span>
+              <span>NRG Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group F 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Alemanha x Third Place Group A/B/C/D/F">
+            <div class="bracket-meta">
+              <span>29/06 17:30</span>
+              <span>Gillette Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group A/B/C/D/F</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group F Winner x Marrocos">
+            <div class="bracket-meta">
+              <span>29/06 22:00</span>
+              <span>Estadio BBVA</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group F Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mar.png" alt="">Marrocos</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group E 2nd Place x Group I 2nd Place">
+            <div class="bracket-meta">
+              <span>30/06 14:00</span>
+              <span>AT&amp;T Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group E 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group I 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group I Winner x Third Place Group C/D/F/G/H">
+            <div class="bracket-meta">
+              <span>30/06 18:00</span>
+              <span>MetLife Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group I Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group C/D/F/G/H</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="México x Third Place Group C/E/F/H/I">
+            <div class="bracket-meta">
+              <span>30/06 22:00</span>
+              <span>Estadio Banorte</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group C/E/F/H/I</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group L Winner x Third Place Group E/H/I/J/K">
+            <div class="bracket-meta">
+              <span>01/07 13:00</span>
+              <span>Mercedes-Benz Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group L Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group E/H/I/J/K</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round left">
+            <div class="bracket-round-title">Oitavas de final</div>
+          <article class="bracket-match " aria-label="Round of 32 1 Winner x Round of 32 3 Winner">
+            <div class="bracket-meta">
+              <span>04/07 14:00</span>
+              <span>NRG Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 1 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 3 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 2 Winner x Round of 32 5 Winner">
+            <div class="bracket-meta">
+              <span>04/07 18:00</span>
+              <span>Lincoln Financial Field</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 2 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 5 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 4 Winner x Round of 32 6 Winner">
+            <div class="bracket-meta">
+              <span>05/07 17:00</span>
+              <span>MetLife Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 4 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 6 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 7 Winner x Round of 32 8 Winner">
+            <div class="bracket-meta">
+              <span>05/07 21:00</span>
+              <span>Estadio Banorte</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 7 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 8 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round left">
+            <div class="bracket-round-title">Quartas de final</div>
+          <article class="bracket-match " aria-label="Round of 16 1 Winner x Round of 16 2 Winner">
+            <div class="bracket-meta">
+              <span>09/07 17:00</span>
+              <span>Gillette Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 1 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 2 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 16 5 Winner x Round of 16 6 Winner">
+            <div class="bracket-meta">
+              <span>10/07 16:00</span>
+              <span>SoFi Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 5 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 6 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round left">
+            <div class="bracket-round-title">Semifinais</div>
+          <article class="bracket-match " aria-label="Quarterfinal 1 Winner x Quarterfinal 2 Winner">
+            <div class="bracket-meta">
+              <span>14/07 16:00</span>
+              <span>AT&amp;T Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Quarterfinal 1 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Quarterfinal 2 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-center">
+            <div class="bracket-round-title">Final</div>
+                      <article class="bracket-match bracket-final-card" aria-label="Semifinal 1 Winner x Semifinal 2 Winner">
+            <div class="bracket-meta">
+              <span>19/07 16:00</span>
+              <span>MetLife Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Semifinal 1 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Semifinal 2 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+            <div class="bracket-champion">
+              <div>
+                <span>Campeao</span>
+                <strong>A definir</strong>
+              </div>
+            </div>
+          </div>
+          <div class="bracket-round right">
+            <div class="bracket-round-title">Semifinais</div>
+          <article class="bracket-match " aria-label="Quarterfinal 3 Winner x Quarterfinal 4 Winner">
+            <div class="bracket-meta">
+              <span>15/07 16:00</span>
+              <span>Mercedes-Benz Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Quarterfinal 3 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Quarterfinal 4 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round right">
+            <div class="bracket-round-title">Quartas de final</div>
+          <article class="bracket-match " aria-label="Round of 16 3 Winner x Round of 16 4 Winner">
+            <div class="bracket-meta">
+              <span>11/07 18:00</span>
+              <span>Hard Rock Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 3 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 4 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 16 7 Winner x Round of 16 8 Winner">
+            <div class="bracket-meta">
+              <span>11/07 22:00</span>
+              <span>GEHA Field at Arrowhead Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 7 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 16 8 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round right">
+            <div class="bracket-round-title">Oitavas de final</div>
+          <article class="bracket-match " aria-label="Round of 32 11 Winner x Round of 32 12 Winner">
+            <div class="bracket-meta">
+              <span>06/07 16:00</span>
+              <span>AT&amp;T Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 11 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 12 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 9 Winner x Round of 32 10 Winner">
+            <div class="bracket-meta">
+              <span>06/07 21:00</span>
+              <span>Lumen Field</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 9 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 10 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 14 Winner x Round of 32 16 Winner">
+            <div class="bracket-meta">
+              <span>07/07 13:00</span>
+              <span>Mercedes-Benz Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 14 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 16 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Round of 32 13 Winner x Round of 32 15 Winner">
+            <div class="bracket-meta">
+              <span>07/07 17:00</span>
+              <span>BC Place</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 13 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Round of 32 15 Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+          <div class="bracket-round right">
+            <div class="bracket-round-title">Fase de 32</div>
+          <article class="bracket-match " aria-label="Group G Winner x Third Place Group A/E/H/I/J">
+            <div class="bracket-meta">
+              <span>01/07 17:00</span>
+              <span>Lumen Field</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group G Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group A/E/H/I/J</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Estados Unidos x Third Place Group B/E/F/I/J">
+            <div class="bracket-meta">
+              <span>01/07 21:00</span>
+              <span>Levi&#x27;s Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/usa.png" alt="">Estados Unidos</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group B/E/F/I/J</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group H Winner x Group J 2nd Place">
+            <div class="bracket-meta">
+              <span>02/07 16:00</span>
+              <span>SoFi Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group H Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group J 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group K 2nd Place x Group L 2nd Place">
+            <div class="bracket-meta">
+              <span>02/07 20:00</span>
+              <span>BMO Field</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group K 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group L 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Suíça x Third Place Group E/F/G/I/J">
+            <div class="bracket-meta">
+              <span>03/07 00:00</span>
+              <span>BC Place</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group E/F/G/I/J</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group D 2nd Place x Group G 2nd Place">
+            <div class="bracket-meta">
+              <span>03/07 15:00</span>
+              <span>AT&amp;T Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group D 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group G 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Argentina x Group H 2nd Place">
+            <div class="bracket-meta">
+              <span>03/07 19:00</span>
+              <span>Hard Rock Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/arg.png" alt="">Argentina</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group H 2nd Place</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          <article class="bracket-match " aria-label="Group K Winner x Third Place Group D/E/I/J/L">
+            <div class="bracket-meta">
+              <span>03/07 22:30</span>
+              <span>GEHA Field at Arrowhead Stadium</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Group K Winner</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-label">Third Place Group D/E/I/J/L</span>
+              <span class="bracket-score"></span>
+            </div>
+            <div class="bracket-status">Agendado</div>
+          </article>
+          </div>
+        </div>
       </div>
     </section>
         <section id="tabela-grupos">
@@ -446,49 +1111,49 @@
             <tr>
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span></td>
-              <td>2</td>
-              <td>2</td>
-              <td>0</td>
-              <td>0</td>
+              <td>3</td>
               <td>3</td>
               <td>0</td>
-              <td>+3</td>
+              <td>0</td>
               <td>6</td>
+              <td>0</td>
+              <td>+6</td>
+              <td>9</td>
             </tr>
             <tr>
               <td>2</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">South Korea</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-              <td>2</td>
-              <td>2</td>
-              <td>+0</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span></td>
               <td>3</td>
-            </tr>
-            <tr>
-              <td>3</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span></td>
-              <td>2</td>
-              <td>0</td>
+              <td>1</td>
               <td>1</td>
               <td>1</td>
               <td>2</td>
               <td>3</td>
               <td>-1</td>
+              <td>4</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">South Korea</span></td>
+              <td>3</td>
               <td>1</td>
+              <td>0</td>
+              <td>2</td>
+              <td>2</td>
+              <td>3</td>
+              <td>-1</td>
+              <td>3</td>
             </tr>
             <tr>
               <td>4</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span></td>
-              <td>2</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span></td>
+              <td>3</td>
               <td>0</td>
               <td>1</td>
-              <td>1</td>
-              <td>1</td>
-              <td>3</td>
-              <td>-2</td>
+              <td>2</td>
+              <td>2</td>
+              <td>6</td>
+              <td>-4</td>
               <td>1</td>
             </tr>
           </tbody>
@@ -1336,24 +2001,6 @@
       <div class="matches">
         <article class="match">
           <div class="match-top">
-            <span>23/06/2026 14:00</span>
-            <span>Grupo K</span>
-            <span>NRG Stadium</span>
-          </div>
-          <div class="score" aria-label="Portugal 5 x 0 Uzbequistão"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span> <span>5 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uzb.png" alt="">Uzbequistão</span></div>
-          <div>FT</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>23/06/2026 17:00</span>
-            <span>Grupo L</span>
-            <span>Gillette Stadium</span>
-          </div>
-          <div class="score" aria-label="Inglaterra 0 x 0 Gana"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span> <span>0 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></div>
-          <div>FT</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
             <span>23/06/2026 20:00</span>
             <span>Grupo L</span>
             <span>BMO Field</span>
@@ -1404,6 +2051,24 @@
             <span>Hard Rock Stadium</span>
           </div>
           <div class="score" aria-label="Escócia 0 x 3 Brasil"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sco.png" alt="">Escócia</span> <span>0 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span></div>
+          <div>FT</div>
+        </article>
+        <article class="match">
+          <div class="match-top">
+            <span>24/06/2026 22:00</span>
+            <span>Grupo A</span>
+            <span>Estadio Banorte</span>
+          </div>
+          <div class="score" aria-label="Tchéquia 0 x 3 México"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span> <span>0 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span></div>
+          <div>FT</div>
+        </article>
+        <article class="match">
+          <div class="match-top">
+            <span>24/06/2026 22:00</span>
+            <span>Grupo A</span>
+            <span>Estadio BBVA</span>
+          </div>
+          <div class="score" aria-label="África do Sul 1 x 0 South Korea"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span> <span>1 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">South Korea</span></div>
           <div>FT</div>
         </article>
       </div>

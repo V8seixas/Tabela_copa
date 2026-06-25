@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from copa2026 import (
     build_group_tables,
@@ -152,7 +152,43 @@ class Copa2026Tests(unittest.TestCase):
 
         self.assertEqual(match["home"], "Alemanha")
         self.assertEqual(match["away"], "Third Place Group A/B/C/D/F")
-        self.assertEqual(match["stage"], "Mata-mata")
+        self.assertEqual(match["stage"], "Fase de 32")
+
+    def test_winner_placeholders_are_labeled_as_next_knockout_stage(self):
+        round_of_16 = event(
+            None,
+            "Round of 32 1 Winner",
+            "Round of 32 3 Winner",
+            0,
+            0,
+            completed=False,
+            note="FIFA World Cup",
+        )
+        round_of_16["name"] = "Round of 32 3 Winner at Round of 32 1 Winner"
+        quarterfinal = event(
+            None,
+            "Round of 16 1 Winner",
+            "Round of 16 2 Winner",
+            0,
+            0,
+            completed=False,
+            note="FIFA World Cup",
+        )
+        quarterfinal["name"] = "Round of 16 2 Winner at Round of 16 1 Winner"
+        final = event(
+            None,
+            "Semifinal 1 Winner",
+            "Semifinal 2 Winner",
+            0,
+            0,
+            completed=False,
+            note="FIFA World Cup",
+        )
+        final["name"] = "Semifinal 2 Winner at Semifinal 1 Winner"
+
+        self.assertEqual(normalize_match(round_of_16)["stage"], "Oitavas de final")
+        self.assertEqual(normalize_match(quarterfinal)["stage"], "Quartas de final")
+        self.assertEqual(normalize_match(final)["stage"], "Final")
 
     def test_build_stage_summaries_counts_pending_stages_in_order(self):
         matches = [
@@ -233,6 +269,42 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn('href="#placar-agora"', content)
         self.assertIn('id="proximas-etapas"', content)
 
+    def test_render_html_includes_knockout_bracket(self):
+        data = {
+            "events": [
+                event(
+                    None,
+                    "Brazil",
+                    "France",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-06-29T20:00Z",
+                    note="FIFA World Cup, Round of 32",
+                ),
+                event(
+                    None,
+                    "Semifinal 1 Winner",
+                    "Semifinal 2 Winner",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-07-19T19:00Z",
+                    note="FIFA World Cup",
+                ),
+            ]
+        }
+        data["events"][1]["name"] = "Semifinal 2 Winner at Semifinal 1 Winner"
+
+        content = render_html(data, "teste", None, recent_limit=5, upcoming_limit=5)
+
+        self.assertIn('href="#chaveamento"', content)
+        self.assertIn('id="chaveamento"', content)
+        self.assertIn("bracket-grid", content)
+        self.assertIn("Brasil", content)
+        self.assertIn("Final", content)
+        self.assertIn("Campeao", content)
+
     def test_render_html_shows_team_flags_when_available(self):
         data = {
             "events": [
@@ -291,7 +363,34 @@ class Copa2026Tests(unittest.TestCase):
         self.assertEqual([match["home"] for match in active], ["Brasil", "Argentina"])
         self.assertEqual(active[1]["detail"], "35'")
 
+    def test_current_matches_ignore_stale_live_cache_entries(self):
+        matches = [
+            normalize_match(
+                event(
+                    "A",
+                    "Czechia",
+                    "Mexico",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-06-25T01:00Z",
+                    state="in",
+                    detail="41'",
+                )
+            ),
+        ]
+
+        active = current_matches(
+            [item for item in matches if item is not None],
+            datetime(2026, 6, 25, 14, 0, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual(active, [])
+
     def test_render_html_shows_all_current_scoreboards(self):
+        live_date = (
+            datetime.now(timezone.utc) - timedelta(minutes=30)
+        ).isoformat().replace("+00:00", "Z")
         data = {
             "events": [
                 event(
@@ -301,7 +400,7 @@ class Copa2026Tests(unittest.TestCase):
                     2,
                     1,
                     completed=False,
-                    date="2026-06-24T16:00Z",
+                    date=live_date,
                     state="in",
                     detail="70'",
                     home_logo="https://example.com/arg.png",
@@ -314,7 +413,7 @@ class Copa2026Tests(unittest.TestCase):
                     0,
                     0,
                     completed=False,
-                    date="2026-06-24T16:00Z",
+                    date=live_date,
                     detail="Scheduled",
                     home_logo="https://example.com/sui.png",
                     away_logo="https://example.com/can.png",

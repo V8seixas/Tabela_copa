@@ -36,6 +36,10 @@ python3 copa2026.py --html dashboard.html
 
 O HTML gerado exibe `Autor: Vinícius Melo Seixas`.
 
+O dashboard tambem inclui um chaveamento visual do mata-mata, com fase de 32,
+oitavas, quartas, semifinais, final e campeao. Os confrontos sao montados
+automaticamente a partir dos dados da ESPN.
+
 Exportar os dados normalizados em JSON:
 
 ```bash

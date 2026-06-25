@@ -12,7 +12,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -24,6 +24,7 @@ TOURNAMENT_END = date(2026, 7, 19)
 DEFAULT_CACHE = Path(".cache/copa2026-scoreboard.json")
 AUTHOR = "Vinícius Melo Seixas"
 DASHBOARD_BACKGROUND_IMAGE = "picture_cup_2026_1.png"
+CURRENT_MATCH_WINDOW = timedelta(hours=3)
 TEAM_NAME_TRANSLATIONS = {
     "Albania": "Albânia",
     "Algeria": "Argélia",
@@ -121,6 +122,13 @@ STAGE_ORDER = {
     "Final": 6,
     "Mata-mata": 7,
 }
+KNOCKOUT_BRACKET_STAGES = (
+    "Fase de 32",
+    "Oitavas de final",
+    "Quartas de final",
+    "Semifinais",
+    "Final",
+)
 
 
 @dataclass
@@ -329,7 +337,17 @@ def stage_name(event: dict[str, Any], competition: dict[str, Any]) -> str:
     text = " ".join(str(value) for value in values if value).lower()
 
     if any(term in text for term in ("third place group", "third-place group")):
-        return "Mata-mata"
+        return "Fase de 32"
+    if "semifinal" in text and "loser" in text:
+        return "Disputa de 3o lugar"
+    if "semifinal" in text and "winner" in text:
+        return "Final"
+    if "quarterfinal" in text and "winner" in text:
+        return "Semifinais"
+    if "round of 16" in text and "winner" in text:
+        return "Quartas de final"
+    if "round of 32" in text and "winner" in text:
+        return "Oitavas de final"
     if any(term in text for term in ("third-place", "third place", "3rd place")):
         return "Disputa de 3o lugar"
     if any(term in text for term in ("semifinal", "semi-final", "semifinais")):
@@ -342,7 +360,7 @@ def stage_name(event: dict[str, Any], competition: dict[str, Any]) -> str:
         return "Fase de 32"
     if "final" in text:
         return "Final"
-    return "Mata-mata"
+    return "Fase de 32"
 
 
 def is_completed(competition: dict[str, Any]) -> bool:
@@ -606,15 +624,7 @@ def current_matches(
     matches: list[dict[str, Any]], now: datetime | None = None
 ) -> list[dict[str, Any]]:
     reference = now or datetime.now(timezone.utc)
-    active = [
-        match
-        for match in matches
-        if not match["completed"]
-        and (
-            str(match.get("state", "")).lower() == "in"
-            or datetime.fromisoformat(match["date"]) <= reference
-        )
-    ]
+    active = [match for match in matches if is_current_match(match, reference)]
     return sorted(
         active,
         key=lambda match: (
@@ -623,6 +633,20 @@ def current_matches(
             str(match.get("away") or ""),
         ),
     )
+
+
+def is_current_match(match: dict[str, Any], reference: datetime) -> bool:
+    if match["completed"]:
+        return False
+
+    match_date = datetime.fromisoformat(match["date"])
+    if match_date > reference:
+        return False
+    if reference - match_date > CURRENT_MATCH_WINDOW:
+        return False
+
+    state = str(match.get("state", "")).lower()
+    return state == "in" or match_date <= reference
 
 
 def current_match(
@@ -906,6 +930,7 @@ def render_html(
       padding: 16px;
       color: var(--muted);
     }}
+{html_knockout_bracket_styles()}
     @media (max-width: 700px) {{
       .live-teams {{
         grid-template-columns: 1fr;
@@ -942,6 +967,7 @@ def render_html(
     {html_dashboard_toc()}
     {html_live_scoreboard(live_matches_now)}
     {html_stage_dashboard(stage_summaries)}
+    {html_knockout_bracket(matches)}
     {html_group_tables(visible_tables)}
     {html_match_section("Proximos jogos", upcoming[:upcoming_limit] if upcoming_limit else [], include_score=False)}
     {html_match_section("Resultados recentes", completed[-recent_limit:] if recent_limit else [], include_score=True)}
@@ -950,6 +976,376 @@ def render_html(
 </body>
 </html>
 """
+
+
+def html_knockout_bracket_styles() -> str:
+    return """
+    .knockout-bracket {
+      margin-top: 28px;
+      padding: 18px;
+      overflow: hidden;
+      background: rgba(7, 17, 35, 0.92);
+      border: 1px solid rgba(125, 211, 252, 0.36);
+      border-radius: 8px;
+      box-shadow: 0 18px 42px rgba(3, 10, 28, 0.34);
+    }
+    .knockout-bracket h2 {
+      margin-bottom: 6px;
+    }
+    .bracket-note {
+      margin: 0 0 16px;
+      color: #cbd5e1;
+      font-size: 13px;
+    }
+    .bracket-scroll {
+      overflow-x: auto;
+      padding: 4px 2px 10px;
+    }
+    .bracket-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(178px, 1fr)) minmax(220px, 1.1fr) repeat(4, minmax(178px, 1fr));
+      gap: 14px;
+      min-width: 1680px;
+      align-items: center;
+    }
+    .bracket-round {
+      display: grid;
+      align-content: center;
+      gap: 10px;
+      min-height: 100%;
+    }
+    .bracket-round-title {
+      min-height: 28px;
+      color: #bae6fd;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .bracket-match {
+      position: relative;
+      display: grid;
+      gap: 8px;
+      min-height: 118px;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.90);
+      border: 1px solid rgba(96, 165, 250, 0.38);
+      border-radius: 8px;
+      color: #f8fafc;
+      box-shadow: 0 0 18px rgba(37, 99, 235, 0.16);
+    }
+    .bracket-round.left .bracket-match::after,
+    .bracket-final-card::before,
+    .bracket-round.right .bracket-match::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 14px;
+      border-top: 1px solid rgba(125, 211, 252, 0.48);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
+    }
+    .bracket-round.left .bracket-match::after {
+      right: -15px;
+    }
+    .bracket-round.right .bracket-match::before {
+      left: -15px;
+    }
+    .bracket-final-card::before {
+      left: -15px;
+    }
+    .bracket-final-card::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -15px;
+      width: 14px;
+      border-top: 1px solid rgba(125, 211, 252, 0.48);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.28);
+    }
+    .bracket-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bracket-team {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 28px;
+      padding: 5px 0;
+      border-top: 1px solid rgba(148, 163, 184, 0.20);
+    }
+    .bracket-team:first-of-type {
+      border-top: 0;
+    }
+    .bracket-team .team-label {
+      min-width: 0;
+      color: #f8fafc;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .bracket-team .team-label img {
+      flex: 0 0 20px;
+    }
+    .bracket-team.winner .team-label,
+    .bracket-team.winner .bracket-score {
+      color: #86efac;
+    }
+    .bracket-score {
+      min-width: 28px;
+      color: #dbeafe;
+      font-weight: 900;
+      text-align: right;
+    }
+    .bracket-status {
+      color: #93c5fd;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .bracket-placeholder {
+      display: grid;
+      min-height: 92px;
+      place-items: center;
+      padding: 12px;
+      color: #94a3b8;
+      border: 1px dashed rgba(148, 163, 184, 0.38);
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.44);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .bracket-center {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+    .bracket-final-card,
+    .bracket-champion {
+      position: relative;
+      border-radius: 8px;
+    }
+    .bracket-final-card {
+      border: 1px solid rgba(250, 204, 21, 0.54);
+      box-shadow: 0 0 22px rgba(250, 204, 21, 0.14);
+    }
+    .bracket-champion {
+      display: grid;
+      min-height: 112px;
+      place-items: center;
+      padding: 14px;
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(88, 62, 9, 0.70));
+      border: 1px solid rgba(250, 204, 21, 0.62);
+      color: #fef3c7;
+      text-align: center;
+      box-shadow: 0 0 26px rgba(250, 204, 21, 0.16);
+    }
+    .bracket-champion span {
+      display: block;
+      color: #fde68a;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .bracket-champion strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1.15;
+    }
+    @media (max-width: 700px) {
+      .knockout-bracket {
+        padding: 14px;
+      }
+      .bracket-grid {
+        min-width: 1540px;
+        grid-template-columns: repeat(4, 164px) 204px repeat(4, 164px);
+        gap: 10px;
+      }
+    }"""
+
+
+def html_knockout_bracket(matches: list[dict[str, Any]]) -> str:
+    rounds = knockout_bracket_rounds(matches)
+    if not any(rounds.values()):
+        return """    <section id="chaveamento" class="knockout-bracket">
+      <h2>Chaveamento</h2>
+      <p class="empty">Nenhum jogo de mata-mata encontrado no periodo consultado.</p>
+    </section>"""
+
+    side_stages = KNOCKOUT_BRACKET_STAGES[:-1]
+    split_rounds = {
+        stage: split_bracket_matches(rounds.get(stage, [])) for stage in side_stages
+    }
+    left_rounds = "\n".join(
+        html_bracket_round(stage, split_rounds[stage][0], "left")
+        for stage in side_stages
+    )
+    right_rounds = "\n".join(
+        html_bracket_round(stage, split_rounds[stage][1], "right")
+        for stage in reversed(side_stages)
+    )
+    final_match = rounds["Final"][0] if rounds["Final"] else None
+
+    return f"""    <section id="chaveamento" class="knockout-bracket">
+      <h2>Chaveamento</h2>
+      <p class="bracket-note">Mata-mata organizado em dois lados que convergem para a final e o campeao.</p>
+      <div class="bracket-scroll" aria-label="Chaveamento do mata-mata da Copa do Mundo">
+        <div class="bracket-grid">
+{left_rounds}
+          <div class="bracket-center">
+            <div class="bracket-round-title">Final</div>
+            {html_bracket_final(final_match)}
+            {html_bracket_champion(final_match)}
+          </div>
+{right_rounds}
+        </div>
+      </div>
+    </section>"""
+
+
+def knockout_bracket_rounds(
+    matches: list[dict[str, Any]]
+) -> dict[str, list[dict[str, Any]]]:
+    rounds: dict[str, list[dict[str, Any]]] = {
+        stage: [] for stage in KNOCKOUT_BRACKET_STAGES
+    }
+    for match in matches:
+        stage = str(match.get("stage") or "")
+        if match.get("group") != "Sem grupo" or stage not in rounds:
+            continue
+        rounds[stage].append(match)
+
+    for stage_matches in rounds.values():
+        stage_matches.sort(
+            key=lambda match: (
+                datetime.fromisoformat(match["date"]),
+                str(match.get("home") or ""),
+                str(match.get("away") or ""),
+            )
+        )
+    return rounds
+
+
+def split_bracket_matches(
+    matches: list[dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    middle = (len(matches) + 1) // 2
+    return matches[:middle], matches[middle:]
+
+
+def html_bracket_round(
+    stage: str,
+    matches: list[dict[str, Any]],
+    side: str,
+) -> str:
+    cards = (
+        "\n".join(html_bracket_match_card(match) for match in matches)
+        if matches
+        else """          <div class="bracket-placeholder">Aguardando confrontos</div>"""
+    )
+    return f"""          <div class="bracket-round {escape_html(side)}">
+            <div class="bracket-round-title">{escape_html(stage)}</div>
+{cards}
+          </div>"""
+
+
+def html_bracket_final(match: dict[str, Any] | None) -> str:
+    if match is None:
+        return """<div class="bracket-placeholder">Final a definir</div>"""
+    return html_bracket_match_card(match, extra_class="bracket-final-card")
+
+
+def html_bracket_champion(match: dict[str, Any] | None) -> str:
+    winner = bracket_match_winner(match) if match else None
+    champion = (
+        html_team_label(winner["name"], winner.get("logo"))
+        if winner is not None
+        else "A definir"
+    )
+    return f"""<div class="bracket-champion">
+              <div>
+                <span>Campeao</span>
+                <strong>{champion}</strong>
+              </div>
+            </div>"""
+
+
+def html_bracket_match_card(
+    match: dict[str, Any],
+    extra_class: str = "",
+) -> str:
+    when = datetime.fromisoformat(match["date"]).astimezone().strftime("%d/%m %H:%M")
+    venue = match.get("venue") or "Local a definir"
+    status = bracket_status_label(match)
+    winner = bracket_match_winner(match)
+    home_winner = winner is not None and winner["side"] == "home"
+    away_winner = winner is not None and winner["side"] == "away"
+    score_visible = match["completed"] or str(match.get("state", "")).lower() == "in"
+    score = (
+        f"{match['home_score']} x {match['away_score']}"
+        if score_visible
+        else "x"
+    )
+    pairing_text = f"{match['home']} {score} {match['away']}"
+
+    return f"""          <article class="bracket-match {escape_html(extra_class)}" aria-label="{escape_html(pairing_text)}">
+            <div class="bracket-meta">
+              <span>{escape_html(when)}</span>
+              <span>{escape_html(venue)}</span>
+            </div>
+            {html_bracket_team(match["home"], match.get("home_logo"), match["home_score"], home_winner, score_visible)}
+            {html_bracket_team(match["away"], match.get("away_logo"), match["away_score"], away_winner, score_visible)}
+            <div class="bracket-status">{escape_html(status)}</div>
+          </article>"""
+
+
+def html_bracket_team(
+    name: object,
+    logo: object,
+    score_value: object,
+    is_winner: bool,
+    score_visible: bool,
+) -> str:
+    winner_class = " winner" if is_winner else ""
+    score_text = escape_html(score_value) if score_visible else ""
+    return f"""<div class="bracket-team{winner_class}">
+              {html_team_label(name, logo)}
+              <span class="bracket-score">{score_text}</span>
+            </div>"""
+
+
+def bracket_status_label(match: dict[str, Any]) -> str:
+    if match["completed"]:
+        return "Encerrado"
+    if str(match.get("state", "")).lower() == "in":
+        return "Ao vivo"
+    return "Agendado"
+
+
+def bracket_match_winner(match: dict[str, Any] | None) -> dict[str, str] | None:
+    if not match or not match["completed"]:
+        return None
+    if match["home_score"] > match["away_score"]:
+        return {
+            "side": "home",
+            "name": str(match["home"]),
+            "logo": str(match.get("home_logo") or ""),
+        }
+    if match["away_score"] > match["home_score"]:
+        return {
+            "side": "away",
+            "name": str(match["away"]),
+            "logo": str(match.get("away_logo") or ""),
+        }
+    return None
 
 
 def html_summary_cards(
@@ -981,6 +1377,7 @@ def html_dashboard_toc() -> str:
         ("Resumo", "#resumo"),
         ("Placar agora", "#placar-agora"),
         ("Proximas etapas", "#proximas-etapas"),
+        ("Chaveamento", "#chaveamento"),
         ("Tabela dos grupos", "#tabela-grupos"),
         ("Proximos jogos", "#proximos-jogos"),
         ("Resultados recentes", "#resultados-recentes"),
