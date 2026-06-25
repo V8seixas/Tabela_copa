@@ -135,6 +135,25 @@ class Copa2026Tests(unittest.TestCase):
         self.assertEqual(match["group"], "Sem grupo")
         self.assertEqual(match["stage"], "Fase de 32")
 
+    def test_third_place_group_placeholder_is_not_third_place_match(self):
+        fixture = event(
+            None,
+            "Germany",
+            "Third Place Group A/B/C/D/F",
+            0,
+            0,
+            completed=False,
+            note="FIFA World Cup",
+        )
+        fixture["name"] = "Third Place Group A/B/C/D/F at Germany"
+        fixture["shortName"] = "3RD @ GER"
+
+        match = normalize_match(fixture)
+
+        self.assertEqual(match["home"], "Alemanha")
+        self.assertEqual(match["away"], "Third Place Group A/B/C/D/F")
+        self.assertEqual(match["stage"], "Mata-mata")
+
     def test_build_stage_summaries_counts_pending_stages_in_order(self):
         matches = [
             normalize_match(

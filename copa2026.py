@@ -328,6 +328,8 @@ def stage_name(event: dict[str, Any], competition: dict[str, Any]) -> str:
     ]
     text = " ".join(str(value) for value in values if value).lower()
 
+    if any(term in text for term in ("third place group", "third-place group")):
+        return "Mata-mata"
     if any(term in text for term in ("third-place", "third place", "3rd place")):
         return "Disputa de 3o lugar"
     if any(term in text for term in ("semifinal", "semi-final", "semifinais")):
@@ -660,7 +662,7 @@ def render_html(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Copa do Mundo 2026 - Dashboard</title>
+  <title>Tabela da Copa do Mundo 2026</title>
   <style>
     :root {{
       color-scheme: light;
