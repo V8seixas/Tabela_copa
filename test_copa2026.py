@@ -190,6 +190,23 @@ class Copa2026Tests(unittest.TestCase):
         self.assertEqual(normalize_match(quarterfinal)["stage"], "Quartas de final")
         self.assertEqual(normalize_match(final)["stage"], "Final")
 
+    def test_official_round_of_32_note_keeps_group_winner_fixture_in_round_of_32(self):
+        fixture = event(
+            None,
+            "Group H Winner",
+            "Group J 2nd Place",
+            0,
+            0,
+            completed=False,
+            note="FIFA World Cup, Round of 32",
+        )
+        fixture["name"] = "Group J 2nd Place at Group H Winner"
+        fixture["shortName"] = "2J @ 1H"
+
+        match = normalize_match(fixture)
+
+        self.assertEqual(match["stage"], "Fase de 32")
+
     def test_build_stage_summaries_counts_pending_stages_in_order(self):
         matches = [
             normalize_match(
@@ -304,6 +321,60 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Brasil", content)
         self.assertIn("Final", content)
         self.assertIn("Campeao", content)
+
+    def test_render_html_resolves_round_of_32_group_placeholders_from_table(self):
+        data = {
+            "events": [
+                event("H", "Spain", "Uruguay", 2, 0),
+                event("H", "Spain", "Cape Verde", 1, 0),
+                event("H", "Uruguay", "Cape Verde", 3, 0),
+                event(
+                    None,
+                    "Group H Winner",
+                    "Group H 2nd Place",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-07-02T19:00Z",
+                    note="FIFA World Cup, Round of 32",
+                ),
+            ]
+        }
+        data["events"][-1]["name"] = "Group H 2nd Place at Group H Winner"
+
+        content = render_html(data, "teste", None, recent_limit=5, upcoming_limit=5)
+
+        self.assertIn('href="#fase-32"', content)
+        self.assertIn('id="fase-32"', content)
+        self.assertIn("Espanha", content)
+        self.assertIn("Uruguai", content)
+        self.assertIn("Atual 1º Grupo H", content)
+        self.assertIn("Atual 2º Grupo H", content)
+
+    def test_render_html_translates_third_place_placeholders(self):
+        data = {
+            "events": [
+                event("A", "Mexico", "Brazil", 2, 0),
+                event("A", "Canada", "Brazil", 1, 0),
+                event("A", "Mexico", "Canada", 1, 1),
+                event(
+                    None,
+                    "Germany",
+                    "Third Place Group A/B/C",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-06-29T20:00Z",
+                    note="FIFA World Cup, Round of 32",
+                ),
+            ]
+        }
+
+        content = render_html(data, "teste", None, recent_limit=5, upcoming_limit=5)
+
+        self.assertIn("Alemanha", content)
+        self.assertIn("Melhor 3º A/B/C", content)
+        self.assertIn("Candidatos: A: Brasil", content)
 
     def test_render_html_shows_team_flags_when_available(self):
         data = {

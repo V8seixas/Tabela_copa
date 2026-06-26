@@ -7,6 +7,7 @@ import argparse
 import html
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -45,6 +46,7 @@ TEAM_NAME_TRANSLATIONS = {
     "Chile": "Chile",
     "China": "China",
     "Colombia": "Colômbia",
+    "Congo DR": "RD Congo",
     "Costa Rica": "Costa Rica",
     "Croatia": "Croácia",
     "Czechia": "Tchéquia",
@@ -74,6 +76,7 @@ TEAM_NAME_TRANSLATIONS = {
     "Japan": "Japão",
     "Jordan": "Jordânia",
     "Korea Republic": "Coreia do Sul",
+    "South Korea": "Coreia do Sul",
     "Kosovo": "Kosovo",
     "Mali": "Mali",
     "Mexico": "México",
@@ -104,6 +107,7 @@ TEAM_NAME_TRANSLATIONS = {
     "Switzerland": "Suíça",
     "Tunisia": "Tunísia",
     "Turkey": "Turquia",
+    "Türkiye": "Turquia",
     "Ukraine": "Ucrânia",
     "United Arab Emirates": "Emirados Árabes Unidos",
     "United States": "Estados Unidos",
@@ -129,6 +133,28 @@ KNOCKOUT_BRACKET_STAGES = (
     "Semifinais",
     "Final",
 )
+GROUP_SLOT_PATTERN = re.compile(r"^Group ([A-L]) (Winner|2nd Place)$", re.IGNORECASE)
+THIRD_PLACE_SLOT_PATTERN = re.compile(
+    r"^Third Place Group ([A-L](?:/[A-L])*)$", re.IGNORECASE
+)
+KNOCKOUT_SLOT_PATTERN = re.compile(
+    r"^(Round of 32|Round of 16|Quarterfinal|Semifinal) (\d+) (Winner|Loser)$",
+    re.IGNORECASE,
+)
+GROUP_LETTERS = tuple("ABCDEFGHIJKL")
+POSITION_LABELS = {1: "1º", 2: "2º", 3: "3º"}
+KNOCKOUT_SLOT_STAGE_LABELS = {
+    "round of 32": "Fase de 32",
+    "round of 16": "Oitavas",
+    "quarterfinal": "Quartas",
+    "semifinal": "Semifinal",
+}
+KNOCKOUT_SLOT_STAGE_NAMES = {
+    "round of 32": "Fase de 32",
+    "round of 16": "Oitavas de final",
+    "quarterfinal": "Quartas de final",
+    "semifinal": "Semifinais",
+}
 
 
 @dataclass
@@ -177,6 +203,13 @@ class StageSummary:
     @property
     def pending(self) -> int:
         return self.total - self.completed
+
+
+@dataclass(frozen=True)
+class SlotResolution:
+    name: str
+    logo: str = ""
+    note: str = ""
 
 
 def parse_args() -> argparse.Namespace:
@@ -328,6 +361,24 @@ def stage_name(event: dict[str, Any], competition: dict[str, Any]) -> str:
     if is_group_stage(competition):
         return "Fase de grupos"
 
+    direct_values = [
+        competition.get("altGameNote"),
+        competition.get("note"),
+    ]
+    direct_text = " ".join(str(value) for value in direct_values if value).lower()
+    if any(term in direct_text for term in ("third-place", "third place", "3rd place")):
+        return "Disputa de 3o lugar"
+    if any(term in direct_text for term in ("round of 32", "fase de 32")):
+        return "Fase de 32"
+    if any(term in direct_text for term in ("round of 16", "oitavas")):
+        return "Oitavas de final"
+    if any(term in direct_text for term in ("quarterfinal", "quarter-final", "quartas")):
+        return "Quartas de final"
+    if any(term in direct_text for term in ("semifinal", "semi-final", "semifinais")):
+        return "Semifinais"
+    if "final" in direct_text:
+        return "Final"
+
     values = [
         competition.get("altGameNote"),
         competition.get("note"),
@@ -438,6 +489,174 @@ def group_key(group: str, team_name: str) -> str:
 
 def team_sort_key(team: TeamStats) -> tuple[int, int, int, str]:
     return (-team.points, -team.goal_difference, -team.goals_for, team.name)
+
+
+def resolve_match_placeholders(
+    matches: list[dict[str, Any]], tables: dict[str, list[TeamStats]]
+) -> list[dict[str, Any]]:
+    knockout_results = knockout_slot_results(matches)
+    return [
+        resolve_match_participants(match, tables, knockout_results)
+        for match in matches
+    ]
+
+
+def resolve_match_participants(
+    match: dict[str, Any],
+    tables: dict[str, list[TeamStats]],
+    knockout_results: dict[tuple[str, int, str], SlotResolution],
+) -> dict[str, Any]:
+    if match.get("group") != "Sem grupo":
+        return match
+
+    resolved = match.copy()
+    home = resolve_participant_slot(
+        str(match.get("home") or ""),
+        str(match.get("home_logo") or ""),
+        tables,
+        knockout_results,
+    )
+    away = resolve_participant_slot(
+        str(match.get("away") or ""),
+        str(match.get("away_logo") or ""),
+        tables,
+        knockout_results,
+    )
+    resolved.update(
+        {
+            "home": home.name,
+            "home_logo": home.logo,
+            "home_note": home.note,
+            "away": away.name,
+            "away_logo": away.logo,
+            "away_note": away.note,
+        }
+    )
+    return resolved
+
+
+def resolve_participant_slot(
+    name: str,
+    logo: str,
+    tables: dict[str, list[TeamStats]],
+    knockout_results: dict[tuple[str, int, str], SlotResolution],
+) -> SlotResolution:
+    group_match = GROUP_SLOT_PATTERN.match(name)
+    if group_match:
+        group, raw_position = group_match.groups()
+        position = 1 if raw_position.lower() == "winner" else 2
+        return resolve_group_position_slot(group.upper(), position, tables)
+
+    third_place_match = THIRD_PLACE_SLOT_PATTERN.match(name)
+    if third_place_match:
+        groups = tuple(third_place_match.group(1).upper().split("/"))
+        return resolve_third_place_slot(groups, tables)
+
+    knockout_match = KNOCKOUT_SLOT_PATTERN.match(name)
+    if knockout_match:
+        raw_stage, raw_number, raw_result = knockout_match.groups()
+        stage_key = raw_stage.lower()
+        result_key = raw_result.lower()
+        stage = KNOCKOUT_SLOT_STAGE_NAMES[stage_key]
+        match_number = int(raw_number)
+        resolved = knockout_results.get((stage, match_number, result_key))
+        if resolved is not None:
+            return resolved
+
+        result_label = "Vencedor" if result_key == "winner" else "Perdedor"
+        stage_label = KNOCKOUT_SLOT_STAGE_LABELS[stage_key]
+        return SlotResolution(
+            f"{result_label} {stage_label} {match_number}",
+            "",
+            "A definir",
+        )
+
+    return SlotResolution(translate_team_name(name), logo)
+
+
+def resolve_group_position_slot(
+    group: str, position: int, tables: dict[str, list[TeamStats]]
+) -> SlotResolution:
+    teams = tables.get(group, [])
+    position_label = POSITION_LABELS.get(position, f"{position}º")
+    if len(teams) < position:
+        return SlotResolution(f"{position_label} Grupo {group}", "", "A definir")
+
+    team = teams[position - 1]
+    note_prefix = position_label
+    if not is_group_complete(teams):
+        note_prefix = f"Atual {position_label}"
+    return SlotResolution(team.name, team.logo, f"{note_prefix} Grupo {group}")
+
+
+def resolve_third_place_slot(
+    groups: tuple[str, ...], tables: dict[str, list[TeamStats]]
+) -> SlotResolution:
+    known_candidates = [
+        (group, tables[group][2])
+        for group in groups
+        if group in tables and len(tables[group]) >= 3
+    ]
+    if not known_candidates:
+        return SlotResolution(f"Melhor 3º {'/'.join(groups)}", "", "A definir")
+
+    all_groups_complete = all(
+        is_group_complete(tables.get(group, [])) for group in GROUP_LETTERS
+    )
+    qualified_thirds = third_place_qualifiers(tables) if all_groups_complete else []
+    eligible_qualified = [
+        (group, team) for group, team in qualified_thirds if group in groups
+    ]
+    if len(eligible_qualified) == 1:
+        group, team = eligible_qualified[0]
+        return SlotResolution(team.name, team.logo, f"3º Grupo {group}")
+
+    candidates = ", ".join(f"{group}: {team.name}" for group, team in known_candidates)
+    return SlotResolution(
+        f"Melhor 3º {'/'.join(groups)}",
+        "",
+        f"Candidatos: {candidates}",
+    )
+
+
+def third_place_qualifiers(
+    tables: dict[str, list[TeamStats]]
+) -> list[tuple[str, TeamStats]]:
+    third_places = [
+        (group, teams[2])
+        for group, teams in tables.items()
+        if len(teams) >= 3 and is_group_complete(teams)
+    ]
+    return sorted(third_places, key=lambda item: team_sort_key(item[1]))[:8]
+
+
+def is_group_complete(teams: list[TeamStats]) -> bool:
+    return len(teams) >= 4 and all(team.played >= 3 for team in teams[:4])
+
+
+def knockout_slot_results(
+    matches: list[dict[str, Any]]
+) -> dict[tuple[str, int, str], SlotResolution]:
+    results: dict[tuple[str, int, str], SlotResolution] = {}
+    rounds = knockout_bracket_rounds(matches)
+    for stage, stage_matches in rounds.items():
+        for match_number, match in enumerate(stage_matches, start=1):
+            winner = bracket_match_winner(match)
+            if winner is not None:
+                results[(stage, match_number, "winner")] = SlotResolution(
+                    winner["name"],
+                    winner.get("logo", ""),
+                    f"Vencedor {stage} {match_number}",
+                )
+
+            loser = bracket_match_loser(match)
+            if loser is not None:
+                results[(stage, match_number, "loser")] = SlotResolution(
+                    loser["name"],
+                    loser.get("logo", ""),
+                    f"Perdedor {stage} {match_number}",
+                )
+    return results
 
 
 def event_datetime(event: dict[str, Any]) -> datetime:
@@ -558,6 +777,7 @@ def render(
         matches = [
             match for match in matches if str(match["group"]).upper() == group_filter
         ]
+    matches = resolve_match_placeholders(matches, tables)
     now = datetime.now(timezone.utc)
     completed = [match for match in matches if match["completed"]]
     upcoming = [
@@ -572,6 +792,7 @@ def render(
         lines, matches, tables, completed, upcoming, selected_group
     )
     append_stage_dashboard(lines, stage_summaries)
+    append_round_of_32(lines, matches)
     append_tables(lines, tables, selected_group)
     append_upcoming(lines, upcoming[:upcoming_limit] if upcoming_limit else [])
     append_recent_results(lines, completed[-recent_limit:] if recent_limit else [])
@@ -600,6 +821,7 @@ def dashboard_view_data(
         matches = [
             match for match in matches if str(match["group"]).upper() == group_filter
         ]
+    matches = resolve_match_placeholders(matches, tables)
 
     now = datetime.now(timezone.utc)
     completed = [match for match in matches if match["completed"]]
@@ -967,6 +1189,7 @@ def render_html(
     {html_dashboard_toc()}
     {html_live_scoreboard(live_matches_now)}
     {html_stage_dashboard(stage_summaries)}
+    {html_round_of_32_section(matches)}
     {html_knockout_bracket(matches)}
     {html_group_tables(visible_tables)}
     {html_match_section("Proximos jogos", upcoming[:upcoming_limit] if upcoming_limit else [], include_score=False)}
@@ -1083,11 +1306,22 @@ def html_knockout_bracket_styles() -> str:
     .bracket-team:first-of-type {
       border-top: 0;
     }
+    .bracket-team-text {
+      min-width: 0;
+    }
     .bracket-team .team-label {
       min-width: 0;
       color: #f8fafc;
       font-size: 13px;
       font-weight: 800;
+    }
+    .bracket-team-note {
+      display: block;
+      margin-top: 2px;
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.25;
     }
     .bracket-team .team-label img {
       flex: 0 0 20px;
@@ -1301,8 +1535,8 @@ def html_bracket_match_card(
               <span>{escape_html(when)}</span>
               <span>{escape_html(venue)}</span>
             </div>
-            {html_bracket_team(match["home"], match.get("home_logo"), match["home_score"], home_winner, score_visible)}
-            {html_bracket_team(match["away"], match.get("away_logo"), match["away_score"], away_winner, score_visible)}
+            {html_bracket_team(match["home"], match.get("home_logo"), match["home_score"], home_winner, score_visible, match.get("home_note"))}
+            {html_bracket_team(match["away"], match.get("away_logo"), match["away_score"], away_winner, score_visible, match.get("away_note"))}
             <div class="bracket-status">{escape_html(status)}</div>
           </article>"""
 
@@ -1313,11 +1547,20 @@ def html_bracket_team(
     score_value: object,
     is_winner: bool,
     score_visible: bool,
+    note: object = "",
 ) -> str:
     winner_class = " winner" if is_winner else ""
     score_text = escape_html(score_value) if score_visible else ""
+    note_text = str(note or "").strip()
+    note_html = (
+        f"""\n                <span class="bracket-team-note">{escape_html(note_text)}</span>"""
+        if note_text
+        else ""
+    )
     return f"""<div class="bracket-team{winner_class}">
-              {html_team_label(name, logo)}
+              <div class="bracket-team-text">
+                {html_team_label(name, logo)}{note_html}
+              </div>
               <span class="bracket-score">{score_text}</span>
             </div>"""
 
@@ -1340,6 +1583,24 @@ def bracket_match_winner(match: dict[str, Any] | None) -> dict[str, str] | None:
             "logo": str(match.get("home_logo") or ""),
         }
     if match["away_score"] > match["home_score"]:
+        return {
+            "side": "away",
+            "name": str(match["away"]),
+            "logo": str(match.get("away_logo") or ""),
+        }
+    return None
+
+
+def bracket_match_loser(match: dict[str, Any] | None) -> dict[str, str] | None:
+    if not match or not match["completed"]:
+        return None
+    if match["home_score"] < match["away_score"]:
+        return {
+            "side": "home",
+            "name": str(match["home"]),
+            "logo": str(match.get("home_logo") or ""),
+        }
+    if match["away_score"] < match["home_score"]:
         return {
             "side": "away",
             "name": str(match["away"]),
@@ -1377,6 +1638,7 @@ def html_dashboard_toc() -> str:
         ("Resumo", "#resumo"),
         ("Placar agora", "#placar-agora"),
         ("Proximas etapas", "#proximas-etapas"),
+        ("Fase de 32", "#fase-32"),
         ("Chaveamento", "#chaveamento"),
         ("Tabela dos grupos", "#tabela-grupos"),
         ("Proximos jogos", "#proximos-jogos"),
@@ -1489,6 +1751,34 @@ def html_stage_dashboard(summaries: list[StageSummary]) -> str:
     </section>"""
 
 
+def html_round_of_32_section(matches: list[dict[str, Any]]) -> str:
+    round_matches = [
+        match
+        for match in matches
+        if match.get("group") == "Sem grupo" and match.get("stage") == "Fase de 32"
+    ]
+    round_matches.sort(
+        key=lambda match: (
+            datetime.fromisoformat(match["date"]),
+            str(match.get("home") or ""),
+            str(match.get("away") or ""),
+        )
+    )
+    if not round_matches:
+        return """    <section id="fase-32">
+      <h2>Fase de 32</h2>
+      <p class="empty">Nenhum confronto da Fase de 32 encontrado no periodo consultado.</p>
+    </section>"""
+
+    items = "\n".join(html_match_card(match, include_score=False) for match in round_matches)
+    return f"""    <section id="fase-32">
+      <h2>Fase de 32</h2>
+      <div class="matches">
+{items}
+      </div>
+    </section>"""
+
+
 def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
     if not tables:
         return """    <section id="tabela-grupos">
@@ -1593,7 +1883,7 @@ def html_match_card(match: dict[str, Any], include_score: bool) -> str:
             f"{html_team_label(match['away'], match.get('away_logo'))}"
         )
     venue = match.get("venue") or "Local a definir"
-    detail = match.get("detail") or ""
+    detail = match_detail_with_slot_notes(match)
     return f"""        <article class="match">
           <div class="match-top">
             <span>{escape_html(when)}</span>
@@ -1603,6 +1893,21 @@ def html_match_card(match: dict[str, Any], include_score: bool) -> str:
           <div class="score" aria-label="{escape_html(pairing_text)}">{pairing}</div>
           <div>{escape_html(detail)}</div>
         </article>"""
+
+
+def match_detail_with_slot_notes(match: dict[str, Any]) -> str:
+    details = [str(match.get("detail") or "").strip()]
+    details.extend(slot_note for slot_note in match_slot_notes(match) if slot_note)
+    return " | ".join(detail for detail in details if detail)
+
+
+def match_slot_notes(match: dict[str, Any]) -> list[str]:
+    notes = []
+    for key in ("home_note", "away_note"):
+        note = str(match.get(key) or "").strip()
+        if note and note not in notes:
+            notes.append(note)
+    return notes
 
 
 def html_team_label(name: object, logo: object = "") -> str:
@@ -1719,6 +2024,30 @@ def append_stage_dashboard(lines: list[str], summaries: list[StageSummary]) -> N
     lines.append("")
 
 
+def append_round_of_32(lines: list[str], matches: list[dict[str, Any]]) -> None:
+    append_section_title(lines, "Fase de 32")
+    round_matches = [
+        match
+        for match in matches
+        if match.get("group") == "Sem grupo" and match.get("stage") == "Fase de 32"
+    ]
+    round_matches.sort(
+        key=lambda match: (
+            datetime.fromisoformat(match["date"]),
+            str(match.get("home") or ""),
+            str(match.get("away") or ""),
+        )
+    )
+    if not round_matches:
+        lines.append("Nenhum confronto da Fase de 32 encontrado no periodo consultado.")
+        lines.append("")
+        return
+
+    for match in round_matches:
+        lines.append(format_match(match, include_score=False))
+    lines.append("")
+
+
 def format_stage_period(summary: StageSummary) -> str:
     if summary.first_date is None:
         return "-"
@@ -1832,7 +2161,8 @@ def format_match(match: dict[str, Any], include_score: bool = True) -> str:
     else:
         pairing = f"{match['home']} x {match['away']}"
 
-    detail = f" - {match['detail']}" if match.get("detail") else ""
+    detail_text = match_detail_with_slot_notes(match)
+    detail = f" - {detail_text}" if detail_text else ""
     return f"{when} | {stage:<16} | {pairing}{detail}"
 
 
