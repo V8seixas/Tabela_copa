@@ -7,6 +7,7 @@ from copa2026 import (
     build_group_tables,
     build_stage_summaries,
     current_matches,
+    dashboard_view_data,
     normalize_match,
     render_html,
     write_html_dashboard,
@@ -375,6 +376,67 @@ class Copa2026Tests(unittest.TestCase):
         self.assertIn("Alemanha", content)
         self.assertIn("Melhor 3º A/B/C", content)
         self.assertIn("Candidatos: A: Brasil", content)
+
+    def test_dashboard_does_not_duplicate_literal_team_when_slot_conflicts(self):
+        data = {
+            "events": [
+                event(
+                    None,
+                    "South Africa",
+                    "Canada",
+                    0,
+                    1,
+                    date="2026-06-28T19:00Z",
+                    note="FIFA World Cup, Round of 32",
+                ),
+                event(
+                    None,
+                    "Brazil",
+                    "Japan",
+                    2,
+                    1,
+                    date="2026-06-29T17:00Z",
+                    note="FIFA World Cup, Round of 32",
+                ),
+                event(
+                    None,
+                    "Round of 32 2 Winner",
+                    "Round of 32 5 Winner",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-07-04T21:00Z",
+                    note="FIFA World Cup, Round of 16",
+                ),
+                event(
+                    None,
+                    "Brazil",
+                    "Round of 32 6 Winner",
+                    0,
+                    0,
+                    completed=False,
+                    date="2026-07-05T20:00Z",
+                    note="FIFA World Cup, Round of 16",
+                ),
+            ]
+        }
+
+        _, matches, _, _, _ = dashboard_view_data(data, None)
+        round_of_16 = [
+            match for match in matches if match["stage"] == "Oitavas de final"
+        ]
+        participants = [
+            participant
+            for match in round_of_16
+            for participant in (match["home"], match["away"])
+        ]
+
+        self.assertEqual(participants.count("Brasil"), 1)
+        self.assertEqual(round_of_16[0]["home"], "Vencedor Fase de 32 2")
+        self.assertEqual(
+            round_of_16[0]["home_note"],
+            "A confirmar; feed também lista Brasil",
+        )
 
     def test_render_html_shows_team_flags_when_available(self):
         data = {

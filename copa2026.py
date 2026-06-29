@@ -495,10 +495,11 @@ def resolve_match_placeholders(
     matches: list[dict[str, Any]], tables: dict[str, list[TeamStats]]
 ) -> list[dict[str, Any]]:
     knockout_results = knockout_slot_results(matches)
-    return [
+    resolved = [
         resolve_match_participants(match, tables, knockout_results)
         for match in matches
     ]
+    return reconcile_duplicate_knockout_participants(resolved)
 
 
 def resolve_match_participants(
@@ -572,6 +573,80 @@ def resolve_participant_slot(
         )
 
     return SlotResolution(translate_team_name(name), logo)
+
+
+def reconcile_duplicate_knockout_participants(
+    matches: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    occurrences: dict[tuple[str, str], list[tuple[int, str]]] = {}
+    for index, match in enumerate(matches):
+        stage = str(match.get("stage") or "")
+        if (
+            match.get("group") != "Sem grupo"
+            or match.get("completed")
+            or stage not in KNOCKOUT_BRACKET_STAGES
+        ):
+            continue
+
+        for side in ("home", "away"):
+            name = str(match.get(side) or "").strip()
+            if not name or is_slot_label(name):
+                continue
+            occurrences.setdefault((stage, name.casefold()), []).append((index, side))
+
+    reconciled: list[dict[str, Any]] | None = None
+    for occurrence_list in occurrences.values():
+        if len(occurrence_list) < 2:
+            continue
+
+        inferred = [
+            (index, side)
+            for index, side in occurrence_list
+            if is_resolved_slot_participant(matches[index], side)
+        ]
+        literal = [
+            (index, side)
+            for index, side in occurrence_list
+            if not is_resolved_slot_participant(matches[index], side)
+        ]
+        if not inferred or not literal:
+            continue
+
+        if reconciled is None:
+            reconciled = [match.copy() for match in matches]
+
+        for index, side in inferred:
+            source_label = str(matches[index].get(f"{side}_note") or "").strip()
+            if not source_label:
+                continue
+            original_name = str(matches[index].get(side) or "").strip()
+            reconciled[index][side] = source_label
+            reconciled[index][f"{side}_logo"] = ""
+            reconciled[index][
+                f"{side}_note"
+            ] = f"A confirmar; feed também lista {original_name}"
+
+    return reconciled if reconciled is not None else matches
+
+
+def is_resolved_slot_participant(match: dict[str, Any], side: str) -> bool:
+    note = str(match.get(f"{side}_note") or "").strip()
+    return bool(note and not note.startswith(("A definir", "Candidatos:")))
+
+
+def is_slot_label(name: str) -> bool:
+    return bool(
+        name.startswith(
+            (
+                "Vencedor ",
+                "Perdedor ",
+                "Melhor ",
+                "A definir",
+                "Atual ",
+            )
+        )
+        or re.match(r"^\d+º Grupo [A-L]$", name)
+    )
 
 
 def resolve_group_position_slot(
