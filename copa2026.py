@@ -495,10 +495,11 @@ def resolve_match_placeholders(
     matches: list[dict[str, Any]], tables: dict[str, list[TeamStats]]
 ) -> list[dict[str, Any]]:
     knockout_results = knockout_slot_results(matches)
-    return [
+    resolved = [
         resolve_match_participants(match, tables, knockout_results)
         for match in matches
     ]
+    return reconcile_duplicate_knockout_participants(resolved)
 
 
 def resolve_match_participants(
@@ -572,6 +573,80 @@ def resolve_participant_slot(
         )
 
     return SlotResolution(translate_team_name(name), logo)
+
+
+def reconcile_duplicate_knockout_participants(
+    matches: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    occurrences: dict[tuple[str, str], list[tuple[int, str]]] = {}
+    for index, match in enumerate(matches):
+        stage = str(match.get("stage") or "")
+        if (
+            match.get("group") != "Sem grupo"
+            or match.get("completed")
+            or stage not in KNOCKOUT_BRACKET_STAGES
+        ):
+            continue
+
+        for side in ("home", "away"):
+            name = str(match.get(side) or "").strip()
+            if not name or is_slot_label(name):
+                continue
+            occurrences.setdefault((stage, name.casefold()), []).append((index, side))
+
+    reconciled: list[dict[str, Any]] | None = None
+    for occurrence_list in occurrences.values():
+        if len(occurrence_list) < 2:
+            continue
+
+        inferred = [
+            (index, side)
+            for index, side in occurrence_list
+            if is_resolved_slot_participant(matches[index], side)
+        ]
+        literal = [
+            (index, side)
+            for index, side in occurrence_list
+            if not is_resolved_slot_participant(matches[index], side)
+        ]
+        if not inferred or not literal:
+            continue
+
+        if reconciled is None:
+            reconciled = [match.copy() for match in matches]
+
+        for index, side in inferred:
+            source_label = str(matches[index].get(f"{side}_note") or "").strip()
+            if not source_label:
+                continue
+            original_name = str(matches[index].get(side) or "").strip()
+            reconciled[index][side] = source_label
+            reconciled[index][f"{side}_logo"] = ""
+            reconciled[index][
+                f"{side}_note"
+            ] = f"A confirmar; feed também lista {original_name}"
+
+    return reconciled if reconciled is not None else matches
+
+
+def is_resolved_slot_participant(match: dict[str, Any], side: str) -> bool:
+    note = str(match.get(f"{side}_note") or "").strip()
+    return bool(note and not note.startswith(("A definir", "Candidatos:")))
+
+
+def is_slot_label(name: str) -> bool:
+    return bool(
+        name.startswith(
+            (
+                "Vencedor ",
+                "Perdedor ",
+                "Melhor ",
+                "A definir",
+                "Atual ",
+            )
+        )
+        or re.match(r"^\d+º Grupo [A-L]$", name)
+    )
 
 
 def resolve_group_position_slot(
@@ -913,7 +988,8 @@ def render_html(
     :root {{
       color-scheme: light;
       --bg: #f5f7fb;
-      --panel: rgba(255, 255, 255, 0.80);
+      --panel: rgba(255, 255, 255, 0.88);
+      --panel-strong: rgba(255, 255, 255, 0.96);
       --text: #1b2430;
       --muted: #667085;
       --line: #d8dee9;
@@ -921,13 +997,16 @@ def render_html(
       --accent-soft: #e7f0ff;
       --green: #147a3f;
       --gold: #9a6700;
+      --red: #b42318;
+      --shadow: 0 14px 34px rgba(15, 23, 42, 0.18);
     }}
+    html {{ scroll-behavior: smooth; }}
     * {{ box-sizing: border-box; }}
     body {{
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(rgba(5, 10, 24, 0.58), rgba(5, 10, 24, 0.72)),
+        linear-gradient(rgba(5, 10, 24, 0.52), rgba(5, 10, 24, 0.76)),
         url("{escape_html(DASHBOARD_BACKGROUND_IMAGE)}") center top / cover fixed no-repeat,
         var(--bg);
       color: var(--text);
@@ -937,53 +1016,99 @@ def render_html(
     header {{
       background: rgba(15, 23, 42, 0.88);
       color: #ffffff;
-      padding: 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    }}
+    .header-inner {{
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 22px;
+    }}
+    .header-kicker {{
+      margin: 0 0 6px;
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }}
+    .header-meta {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }}
+    .header-pill {{
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
     }}
     main {{
       width: min(1180px, calc(100% - 32px));
       margin: 24px auto 40px;
+      display: grid;
+      gap: 22px;
     }}
+    section {{ scroll-margin-top: 86px; }}
     h1, h2, h3, p {{ margin-top: 0; }}
-    h1 {{ margin-bottom: 8px; font-size: 28px; }}
+    h1 {{
+      max-width: 820px;
+      margin-bottom: 0;
+      font-size: 30px;
+      line-height: 1.15;
+    }}
     h2, h3 {{
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
     }}
-    h2 {{ margin: 28px 0 12px; font-size: 22px; }}
-    h3 {{ margin: 18px 0 10px; font-size: 18px; }}
+    h2 {{ margin: 0 0 12px; font-size: 22px; }}
+    h3 {{ margin: 0 0 10px; font-size: 16px; }}
     .meta {{ color: #d7dce6; margin: 0; }}
     .cards {{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 12px;
     }}
     .toc {{
-      background: var(--panel);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      padding: 12px;
+      box-shadow: var(--shadow);
     }}
     .toc h2 {{
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       color: var(--text);
+      font-size: 14px;
       text-shadow: none;
     }}
     .toc-links {{
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      display: flex;
       gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }}
     .toc-links a {{
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
-      min-height: 42px;
-      padding: 10px 12px;
+      min-height: 36px;
+      padding: 8px 11px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
       color: var(--accent);
+      font-size: 13px;
       font-weight: 700;
       text-decoration: none;
     }}
@@ -995,7 +1120,7 @@ def render_html(
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 16px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
     }}
     .card span {{
       display: block;
@@ -1003,18 +1128,25 @@ def render_html(
       font-size: 13px;
       margin-bottom: 6px;
     }}
-    .card strong {{ font-size: 22px; }}
+    .card strong {{
+      display: block;
+      color: #0f172a;
+      font-size: 24px;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }}
     .table-wrap {{
       overflow-x: auto;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
     }}
     table {{
       width: 100%;
       border-collapse: collapse;
       min-width: 720px;
+      font-variant-numeric: tabular-nums;
     }}
     th, td {{
       padding: 10px 12px;
@@ -1030,6 +1162,7 @@ def render_html(
       text-transform: uppercase;
       letter-spacing: .02em;
     }}
+    tbody tr:hover td {{ background: rgba(231, 240, 255, 0.46); }}
     tr:last-child td {{ border-bottom: 0; }}
     .team {{ font-weight: 700; }}
     .team-label {{
@@ -1051,14 +1184,26 @@ def render_html(
     .status-next {{ color: var(--gold); font-weight: 700; }}
     .matches {{
       display: grid;
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 12px;
     }}
     .match {{
-      background: var(--panel);
+      display: grid;
+      gap: 8px;
+      background: var(--panel-strong);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px 14px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
+    }}
+    .match.completed {{
+      border-left: 5px solid var(--green);
+    }}
+    .match.live {{
+      border-left: 5px solid var(--red);
+    }}
+    .match.upcoming {{
+      border-left: 5px solid var(--accent);
     }}
     .match-top {{
       display: flex;
@@ -1066,7 +1211,6 @@ def render_html(
       gap: 8px 14px;
       color: var(--muted);
       font-size: 13px;
-      margin-bottom: 6px;
     }}
     .score {{
       display: flex;
@@ -1076,13 +1220,18 @@ def render_html(
       font-size: 17px;
       font-weight: 700;
     }}
+    .match-detail {{
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }}
     .live-scoreboard {{
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(9, 105, 218, 0.32);
       border-left: 6px solid var(--accent);
       border-radius: 8px;
       padding: 18px;
-      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22);
+      box-shadow: var(--shadow);
     }}
     .live-scoreboards {{
       display: grid;
@@ -1152,8 +1301,70 @@ def render_html(
       padding: 16px;
       color: var(--muted);
     }}
+    .group-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 14px;
+    }}
+    .group-card {{
+      overflow: hidden;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }}
+    .group-card h3 {{
+      margin: 0;
+      padding: 12px 14px;
+      background: #0f172a;
+      color: #ffffff;
+      text-shadow: none;
+    }}
+    .group-card .table-wrap {{
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+    }}
+    .group-table {{
+      min-width: 0;
+    }}
+    .group-table th,
+    .group-table td {{
+      padding: 8px 9px;
+    }}
+    .group-table th:nth-child(n+3),
+    .group-table td:nth-child(n+3) {{
+      text-align: right;
+    }}
+    .group-table .direct td {{
+      background: rgba(20, 122, 63, 0.08);
+    }}
+    .group-table .third td {{
+      background: rgba(154, 103, 0, 0.08);
+    }}
 {html_knockout_bracket_styles()}
     @media (max-width: 700px) {{
+      body {{
+        background-attachment: scroll;
+      }}
+      .header-inner {{
+        padding: 20px 0;
+      }}
+      h1 {{
+        font-size: 25px;
+      }}
+      main {{
+        width: min(100% - 24px, 1180px);
+        margin-top: 16px;
+      }}
+      .toc {{
+        position: static;
+      }}
+      .matches,
+      .group-grid {{
+        grid-template-columns: 1fr;
+      }}
       .live-teams {{
         grid-template-columns: 1fr;
         gap: 10px;
@@ -1180,9 +1391,16 @@ def render_html(
 </head>
 <body>
   <header>
-    <h1>Copa do Mundo 2026 - Dashboard</h1>
-    <p class="meta">Atualizado: {escape_html(updated)} | Fonte: {escape_html(source_label)} | Grupo: {escape_html(group_label)}</p>
-    <p class="meta">Autor: {escape_html(AUTHOR)}</p>
+    <div class="header-inner">
+      <p class="header-kicker">Copa do Mundo FIFA 2026</p>
+      <h1>Dashboard de jogos, grupos e chaveamento</h1>
+      <div class="header-meta" aria-label="Metadados do dashboard">
+        <span class="header-pill">Atualizado: {escape_html(updated)}</span>
+        <span class="header-pill">Fonte: {escape_html(source_label)}</span>
+        <span class="header-pill">Grupo: {escape_html(group_label)}</span>
+        <span class="header-pill">Autor: {escape_html(AUTHOR)}</span>
+      </div>
+    </div>
   </header>
   <main>
     {html_summary_cards(matches, completed, upcoming, leader_label)}
@@ -1257,6 +1475,17 @@ def html_knockout_bracket_styles() -> str:
       border-radius: 8px;
       color: #f8fafc;
       box-shadow: 0 0 18px rgba(37, 99, 235, 0.16);
+    }
+    .bracket-match.completed {
+      border-color: rgba(134, 239, 172, 0.58);
+      background: rgba(12, 37, 28, 0.92);
+    }
+    .bracket-match.live {
+      border-color: rgba(248, 113, 113, 0.72);
+      background: rgba(69, 10, 10, 0.90);
+    }
+    .bracket-match.upcoming {
+      border-color: rgba(96, 165, 250, 0.38);
     }
     .bracket-round.left .bracket-match::after,
     .bracket-final-card::before,
@@ -1337,10 +1566,23 @@ def html_knockout_bracket_styles() -> str:
       text-align: right;
     }
     .bracket-status {
-      color: #93c5fd;
+      justify-self: start;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(147, 197, 253, 0.12);
+      color: #bfdbfe;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
+    }
+    .bracket-match.completed .bracket-status {
+      background: rgba(134, 239, 172, 0.12);
+      color: #bbf7d0;
+    }
+    .bracket-match.live .bracket-status {
+      background: rgba(248, 113, 113, 0.16);
+      color: #fecaca;
     }
     .bracket-placeholder {
       display: grid;
@@ -1529,8 +1771,17 @@ def html_bracket_match_card(
         else "x"
     )
     pairing_text = f"{match['home']} {score} {match['away']}"
+    class_names = " ".join(
+        item
+        for item in (
+            "bracket-match",
+            bracket_status_class(match),
+            extra_class.strip(),
+        )
+        if item
+    )
 
-    return f"""          <article class="bracket-match {escape_html(extra_class)}" aria-label="{escape_html(pairing_text)}">
+    return f"""          <article class="{escape_html(class_names)}" aria-label="{escape_html(pairing_text)}">
             <div class="bracket-meta">
               <span>{escape_html(when)}</span>
               <span>{escape_html(venue)}</span>
@@ -1571,6 +1822,14 @@ def bracket_status_label(match: dict[str, Any]) -> str:
     if str(match.get("state", "")).lower() == "in":
         return "Ao vivo"
     return "Agendado"
+
+
+def bracket_status_class(match: dict[str, Any]) -> str:
+    if match["completed"]:
+        return "completed"
+    if str(match.get("state", "")).lower() == "in":
+        return "live"
+    return "upcoming"
 
 
 def bracket_match_winner(match: dict[str, Any] | None) -> dict[str, str] | None:
@@ -1788,7 +2047,7 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
 
     sections = []
     for group, teams in tables.items():
-        rows = "\n".join(f"""            <tr>
+        rows = "\n".join(f"""            <tr class="{group_position_class(position)}">
               <td>{position}</td>
               <td class="team">{html_team_label(team.name, team.logo)}</td>
               <td>{team.played}</td>
@@ -1800,9 +2059,10 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
               <td>{team.goal_difference:+d}</td>
               <td>{team.points}</td>
             </tr>""" for position, team in enumerate(teams, start=1))
-        sections.append(f"""      <h3>Grupo {escape_html(group)}</h3>
-      <div class="table-wrap">
-        <table>
+        sections.append(f"""      <article class="group-card">
+        <h3>Grupo {escape_html(group)}</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1821,12 +2081,23 @@ def html_group_tables(tables: dict[str, list[TeamStats]]) -> str:
 {rows}
           </tbody>
         </table>
-      </div>""")
+        </div>
+      </article>""")
 
     return f"""    <section id="tabela-grupos">
       <h2>Tabela dos grupos</h2>
+      <div class="group-grid">
 {chr(10).join(sections)}
+      </div>
     </section>"""
+
+
+def group_position_class(position: int) -> str:
+    if position <= 2:
+        return "direct"
+    if position == 3:
+        return "third"
+    return "eliminated"
 
 
 def html_match_section(
@@ -1884,15 +2155,23 @@ def html_match_card(match: dict[str, Any], include_score: bool) -> str:
         )
     venue = match.get("venue") or "Local a definir"
     detail = match_detail_with_slot_notes(match)
-    return f"""        <article class="match">
+    return f"""        <article class="match {escape_html(match_status_class(match))}">
           <div class="match-top">
             <span>{escape_html(when)}</span>
             <span>{escape_html(stage)}</span>
             <span>{escape_html(venue)}</span>
           </div>
           <div class="score" aria-label="{escape_html(pairing_text)}">{pairing}</div>
-          <div>{escape_html(detail)}</div>
+          <div class="match-detail">{escape_html(detail)}</div>
         </article>"""
+
+
+def match_status_class(match: dict[str, Any]) -> str:
+    if match["completed"]:
+        return "completed"
+    if str(match.get("state", "")).lower() == "in":
+        return "live"
+    return "upcoming"
 
 
 def match_detail_with_slot_notes(match: dict[str, Any]) -> str:

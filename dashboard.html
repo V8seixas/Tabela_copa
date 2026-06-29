@@ -8,7 +8,8 @@
     :root {
       color-scheme: light;
       --bg: #f5f7fb;
-      --panel: rgba(255, 255, 255, 0.80);
+      --panel: rgba(255, 255, 255, 0.88);
+      --panel-strong: rgba(255, 255, 255, 0.96);
       --text: #1b2430;
       --muted: #667085;
       --line: #d8dee9;
@@ -16,13 +17,16 @@
       --accent-soft: #e7f0ff;
       --green: #147a3f;
       --gold: #9a6700;
+      --red: #b42318;
+      --shadow: 0 14px 34px rgba(15, 23, 42, 0.18);
     }
+    html { scroll-behavior: smooth; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
       background:
-        linear-gradient(rgba(5, 10, 24, 0.58), rgba(5, 10, 24, 0.72)),
+        linear-gradient(rgba(5, 10, 24, 0.52), rgba(5, 10, 24, 0.76)),
         url("picture_cup_2026_1.png") center top / cover fixed no-repeat,
         var(--bg);
       color: var(--text);
@@ -32,53 +36,99 @@
     header {
       background: rgba(15, 23, 42, 0.88);
       color: #ffffff;
-      padding: 24px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    .header-inner {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 22px;
+    }
+    .header-kicker {
+      margin: 0 0 6px;
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .header-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .header-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
     }
     main {
       width: min(1180px, calc(100% - 32px));
       margin: 24px auto 40px;
+      display: grid;
+      gap: 22px;
     }
+    section { scroll-margin-top: 86px; }
     h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 8px; font-size: 28px; }
+    h1 {
+      max-width: 820px;
+      margin-bottom: 0;
+      font-size: 30px;
+      line-height: 1.15;
+    }
     h2, h3 {
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
     }
-    h2 { margin: 28px 0 12px; font-size: 22px; }
-    h3 { margin: 18px 0 10px; font-size: 18px; }
+    h2 { margin: 0 0 12px; font-size: 22px; }
+    h3 { margin: 0 0 10px; font-size: 16px; }
     .meta { color: #d7dce6; margin: 0; }
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
       gap: 12px;
     }
     .toc {
-      background: var(--panel);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      padding: 12px;
+      box-shadow: var(--shadow);
     }
     .toc h2 {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       color: var(--text);
+      font-size: 14px;
       text-shadow: none;
     }
     .toc-links {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      display: flex;
       gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
     }
     .toc-links a {
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
-      min-height: 42px;
-      padding: 10px 12px;
+      min-height: 36px;
+      padding: 8px 11px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #ffffff;
       color: var(--accent);
+      font-size: 13px;
       font-weight: 700;
       text-decoration: none;
     }
@@ -90,7 +140,7 @@
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 16px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
     }
     .card span {
       display: block;
@@ -98,18 +148,25 @@
       font-size: 13px;
       margin-bottom: 6px;
     }
-    .card strong { font-size: 22px; }
+    .card strong {
+      display: block;
+      color: #0f172a;
+      font-size: 24px;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
     .table-wrap {
       overflow-x: auto;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
     }
     table {
       width: 100%;
       border-collapse: collapse;
       min-width: 720px;
+      font-variant-numeric: tabular-nums;
     }
     th, td {
       padding: 10px 12px;
@@ -125,6 +182,7 @@
       text-transform: uppercase;
       letter-spacing: .02em;
     }
+    tbody tr:hover td { background: rgba(231, 240, 255, 0.46); }
     tr:last-child td { border-bottom: 0; }
     .team { font-weight: 700; }
     .team-label {
@@ -146,14 +204,26 @@
     .status-next { color: var(--gold); font-weight: 700; }
     .matches {
       display: grid;
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 12px;
     }
     .match {
-      background: var(--panel);
+      display: grid;
+      gap: 8px;
+      background: var(--panel-strong);
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px 14px;
-      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+      box-shadow: var(--shadow);
+    }
+    .match.completed {
+      border-left: 5px solid var(--green);
+    }
+    .match.live {
+      border-left: 5px solid var(--red);
+    }
+    .match.upcoming {
+      border-left: 5px solid var(--accent);
     }
     .match-top {
       display: flex;
@@ -161,7 +231,6 @@
       gap: 8px 14px;
       color: var(--muted);
       font-size: 13px;
-      margin-bottom: 6px;
     }
     .score {
       display: flex;
@@ -171,13 +240,18 @@
       font-size: 17px;
       font-weight: 700;
     }
+    .match-detail {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
     .live-scoreboard {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(9, 105, 218, 0.32);
       border-left: 6px solid var(--accent);
       border-radius: 8px;
       padding: 18px;
-      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.22);
+      box-shadow: var(--shadow);
     }
     .live-scoreboards {
       display: grid;
@@ -247,6 +321,48 @@
       padding: 16px;
       color: var(--muted);
     }
+    .group-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 14px;
+    }
+    .group-card {
+      overflow: hidden;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .group-card h3 {
+      margin: 0;
+      padding: 12px 14px;
+      background: #0f172a;
+      color: #ffffff;
+      text-shadow: none;
+    }
+    .group-card .table-wrap {
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+    .group-table {
+      min-width: 0;
+    }
+    .group-table th,
+    .group-table td {
+      padding: 8px 9px;
+    }
+    .group-table th:nth-child(n+3),
+    .group-table td:nth-child(n+3) {
+      text-align: right;
+    }
+    .group-table .direct td {
+      background: rgba(20, 122, 63, 0.08);
+    }
+    .group-table .third td {
+      background: rgba(154, 103, 0, 0.08);
+    }
 
     .knockout-bracket {
       margin-top: 28px;
@@ -302,6 +418,17 @@
       border-radius: 8px;
       color: #f8fafc;
       box-shadow: 0 0 18px rgba(37, 99, 235, 0.16);
+    }
+    .bracket-match.completed {
+      border-color: rgba(134, 239, 172, 0.58);
+      background: rgba(12, 37, 28, 0.92);
+    }
+    .bracket-match.live {
+      border-color: rgba(248, 113, 113, 0.72);
+      background: rgba(69, 10, 10, 0.90);
+    }
+    .bracket-match.upcoming {
+      border-color: rgba(96, 165, 250, 0.38);
     }
     .bracket-round.left .bracket-match::after,
     .bracket-final-card::before,
@@ -382,10 +509,23 @@
       text-align: right;
     }
     .bracket-status {
-      color: #93c5fd;
+      justify-self: start;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(147, 197, 253, 0.12);
+      color: #bfdbfe;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
+    }
+    .bracket-match.completed .bracket-status {
+      background: rgba(134, 239, 172, 0.12);
+      color: #bbf7d0;
+    }
+    .bracket-match.live .bracket-status {
+      background: rgba(248, 113, 113, 0.16);
+      color: #fecaca;
     }
     .bracket-placeholder {
       display: grid;
@@ -450,6 +590,26 @@
       }
     }
     @media (max-width: 700px) {
+      body {
+        background-attachment: scroll;
+      }
+      .header-inner {
+        padding: 20px 0;
+      }
+      h1 {
+        font-size: 25px;
+      }
+      main {
+        width: min(100% - 24px, 1180px);
+        margin-top: 16px;
+      }
+      .toc {
+        position: static;
+      }
+      .matches,
+      .group-grid {
+        grid-template-columns: 1fr;
+      }
       .live-teams {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -476,9 +636,16 @@
 </head>
 <body>
   <header>
-    <h1>Copa do Mundo 2026 - Dashboard</h1>
-    <p class="meta">Atualizado: 26/06/2026 16:49:01 | Fonte: online | Grupo: Todos</p>
-    <p class="meta">Autor: Vinícius Melo Seixas</p>
+    <div class="header-inner">
+      <p class="header-kicker">Copa do Mundo FIFA 2026</p>
+      <h1>Dashboard de jogos, grupos e chaveamento</h1>
+      <div class="header-meta" aria-label="Metadados do dashboard">
+        <span class="header-pill">Atualizado: 29/06/2026 18:14:05</span>
+        <span class="header-pill">Fonte: online</span>
+        <span class="header-pill">Grupo: Todos</span>
+        <span class="header-pill">Autor: Vinícius Melo Seixas</span>
+      </div>
+    </div>
   </header>
   <main>
         <section id="resumo">
@@ -490,15 +657,15 @@
       </article>
       <article class="card">
         <span>Encerrados</span>
-        <strong>60</strong>
+        <strong>74</strong>
       </article>
       <article class="card">
         <span>Proximos</span>
-        <strong>42</strong>
+        <strong>29</strong>
       </article>
       <article class="card">
         <span>Melhor campanha</span>
-        <strong>México (9 pts)</strong>
+        <strong>França (9 pts)</strong>
       </article>
       </div>
     </section>
@@ -521,42 +688,22 @@
         <article class="live-scoreboard">
         <div class="live-meta">
           <span class="live-badge">Agora</span>
-          <span>Grupo I</span>
-          <span>26/06/2026 16:00</span>
+          <span>Fase de 32</span>
+          <span>29/06/2026 17:30</span>
           <span>Gillette Stadium</span>
         </div>
-        <div class="live-teams" aria-label="Noruega 1 x 3 França">
+        <div class="live-teams" aria-label="Alemanha 0 x 1 Paraguai">
           <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nor.png" alt="">Noruega</span>
-            <strong>1</strong>
-          </div>
-          <span class="live-versus">x</span>
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span>
-            <strong>3</strong>
-          </div>
-        </div>
-        <div class="live-detail">45&#x27;+2&#x27;</div>
-      </article>
-        <article class="live-scoreboard">
-        <div class="live-meta">
-          <span class="live-badge">Agora</span>
-          <span>Grupo I</span>
-          <span>26/06/2026 16:00</span>
-          <span>BMO Field</span>
-        </div>
-        <div class="live-teams" aria-label="Senegal 1 x 0 Iraque">
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sen.png" alt="">Senegal</span>
-            <strong>1</strong>
-          </div>
-          <span class="live-versus">x</span>
-          <div class="live-team">
-            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irq.png" alt="">Iraque</span>
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span>
             <strong>0</strong>
           </div>
+          <span class="live-versus">x</span>
+          <div class="live-team">
+            <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/par.png" alt="">Paraguai</span>
+            <strong>1</strong>
+          </div>
         </div>
-        <div class="live-detail">45&#x27;+2&#x27;</div>
+        <div class="live-detail">43&#x27;</div>
       </article>
       </div>
     </section>
@@ -576,20 +723,12 @@
           </thead>
           <tbody>
           <tr>
-            <td class="stage">Fase de grupos</td>
-            <td>11/06-27/06</td>
-            <td>72</td>
-            <td class="status-ok">60</td>
-            <td class="status-next">10</td>
-            <td>26/06 21:00 Cabo Verde x Arábia Saudita</td>
-          </tr>
-          <tr>
             <td class="stage">Fase de 32</td>
             <td>28/06-03/07</td>
             <td>16</td>
-            <td class="status-ok">0</td>
-            <td class="status-next">16</td>
-            <td>28/06 16:00 África do Sul x Canadá</td>
+            <td class="status-ok">2</td>
+            <td class="status-next">13</td>
+            <td>29/06 22:00 Países Baixos x Marrocos</td>
           </tr>
           <tr>
             <td class="stage">Oitavas de final</td>
@@ -597,7 +736,7 @@
             <td>8</td>
             <td class="status-ok">0</td>
             <td class="status-next">8</td>
-            <td>04/07 14:00 Vencedor Fase de 32 1 x Vencedor Fase de 32 3</td>
+            <td>04/07 14:00 Canadá x Vencedor Fase de 32 3</td>
           </tr>
           <tr>
             <td class="stage">Quartas de final</td>
@@ -638,149 +777,149 @@
         <section id="fase-32">
       <h2>Fase de 32</h2>
       <div class="matches">
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
             <span>28/06/2026 16:00</span>
             <span>Fase de 32</span>
             <span>SoFi Stadium</span>
           </div>
           <div class="score" aria-label="África do Sul x Canadá"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span></div>
-          <div>Scheduled</div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
             <span>29/06/2026 14:00</span>
             <span>Fase de 32</span>
             <span>NRG Stadium</span>
           </div>
           <div class="score" aria-label="Brasil x Japão"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span></div>
-          <div>Scheduled</div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match live">
           <div class="match-top">
             <span>29/06/2026 17:30</span>
             <span>Fase de 32</span>
             <span>Gillette Stadium</span>
           </div>
-          <div class="score" aria-label="Alemanha x Melhor 3º A/B/C/D/F"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span> <span>x</span> <span class="team-label">Melhor 3º A/B/C/D/F</span></div>
-          <div>Scheduled | Candidatos: A: Coreia do Sul, B: Bósnia e Herzegovina, C: Escócia, D: Paraguai, F: Suécia</div>
+          <div class="score" aria-label="Alemanha x Paraguai"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/par.png" alt="">Paraguai</span></div>
+          <div class="match-detail">43&#x27;</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>29/06/2026 22:00</span>
             <span>Fase de 32</span>
             <span>Estadio BBVA</span>
           </div>
           <div class="score" aria-label="Países Baixos x Marrocos"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ned.png" alt="">Países Baixos</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mar.png" alt="">Marrocos</span></div>
-          <div>Scheduled</div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>30/06/2026 14:00</span>
             <span>Fase de 32</span>
             <span>AT&amp;T Stadium</span>
           </div>
           <div class="score" aria-label="Costa do Marfim x Noruega"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/civ.png" alt="">Costa do Marfim</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nor.png" alt="">Noruega</span></div>
-          <div>Scheduled | Atual 2º Grupo I</div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>30/06/2026 18:00</span>
             <span>Fase de 32</span>
             <span>MetLife Stadium</span>
           </div>
-          <div class="score" aria-label="França x Melhor 3º C/D/F/G/H"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span> <span>x</span> <span class="team-label">Melhor 3º C/D/F/G/H</span></div>
-          <div>Scheduled | Atual 1º Grupo I | Candidatos: C: Escócia, D: Paraguai, F: Suécia, G: Bélgica, H: Cabo Verde</div>
+          <div class="score" aria-label="França x Suécia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>30/06/2026 22:00</span>
             <span>Fase de 32</span>
             <span>Estadio Banorte</span>
           </div>
-          <div class="score" aria-label="México x Melhor 3º C/E/F/H/I"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span> <span>x</span> <span class="team-label">Melhor 3º C/E/F/H/I</span></div>
-          <div>Scheduled | Candidatos: C: Escócia, E: Equador, F: Suécia, H: Cabo Verde, I: Senegal</div>
+          <div class="score" aria-label="México x Equador"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>01/07/2026 13:00</span>
             <span>Fase de 32</span>
             <span>Mercedes-Benz Stadium</span>
           </div>
-          <div class="score" aria-label="Inglaterra x Melhor 3º E/H/I/J/K"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span> <span>x</span> <span class="team-label">Melhor 3º E/H/I/J/K</span></div>
-          <div>Scheduled | Atual 1º Grupo L | Candidatos: E: Equador, H: Cabo Verde, I: Senegal, J: Argélia, K: RD Congo</div>
+          <div class="score" aria-label="Inglaterra x RD Congo"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>01/07/2026 17:00</span>
             <span>Fase de 32</span>
             <span>Lumen Field</span>
           </div>
-          <div class="score" aria-label="Egito x Melhor 3º A/E/H/I/J"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span> <span>x</span> <span class="team-label">Melhor 3º A/E/H/I/J</span></div>
-          <div>Scheduled | Atual 1º Grupo G | Candidatos: A: Coreia do Sul, E: Equador, H: Cabo Verde, I: Senegal, J: Argélia</div>
+          <div class="score" aria-label="Bélgica x Senegal"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bel.png" alt="">Bélgica</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sen.png" alt="">Senegal</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>01/07/2026 21:00</span>
             <span>Fase de 32</span>
             <span>Levi&#x27;s Stadium</span>
           </div>
           <div class="score" aria-label="Estados Unidos x Bósnia e Herzegovina"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/usa.png" alt="">Estados Unidos</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bósnia e Herzegovina</span></div>
-          <div>Scheduled</div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>02/07/2026 16:00</span>
             <span>Fase de 32</span>
             <span>SoFi Stadium</span>
           </div>
           <div class="score" aria-label="Espanha x Áustria"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/esp.png" alt="">Espanha</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aut.png" alt="">Áustria</span></div>
-          <div>Scheduled | Atual 1º Grupo H | Atual 2º Grupo J</div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>02/07/2026 20:00</span>
             <span>Fase de 32</span>
             <span>BMO Field</span>
           </div>
-          <div class="score" aria-label="Portugal x Gana"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></div>
-          <div>Scheduled | Atual 2º Grupo K | Atual 2º Grupo L</div>
+          <div class="score" aria-label="Portugal x Croácia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cro.png" alt="">Croácia</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>03/07/2026 00:00</span>
             <span>Fase de 32</span>
             <span>BC Place</span>
           </div>
-          <div class="score" aria-label="Suíça x Melhor 3º E/F/G/I/J"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span> <span>x</span> <span class="team-label">Melhor 3º E/F/G/I/J</span></div>
-          <div>Scheduled | Candidatos: E: Equador, F: Suécia, G: Bélgica, I: Senegal, J: Argélia</div>
+          <div class="score" aria-label="Suíça x Argélia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/alg.png" alt="">Argélia</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>03/07/2026 15:00</span>
             <span>Fase de 32</span>
             <span>AT&amp;T Stadium</span>
           </div>
-          <div class="score" aria-label="Austrália x Irã"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aus.png" alt="">Austrália</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irn.png" alt="">Irã</span></div>
-          <div>Scheduled | Atual 2º Grupo G</div>
+          <div class="score" aria-label="Austrália x Egito"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aus.png" alt="">Austrália</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>03/07/2026 19:00</span>
             <span>Fase de 32</span>
             <span>Hard Rock Stadium</span>
           </div>
-          <div class="score" aria-label="Argentina x Uruguai"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/arg.png" alt="">Argentina</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uru.png" alt="">Uruguai</span></div>
-          <div>Scheduled | Atual 2º Grupo H</div>
+          <div class="score" aria-label="Argentina x Cabo Verde"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/arg.png" alt="">Argentina</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cpv.png" alt="">Cabo Verde</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
             <span>03/07/2026 22:30</span>
             <span>Fase de 32</span>
             <span>GEHA Field at Arrowhead Stadium</span>
           </div>
-          <div class="score" aria-label="Colômbia x Melhor 3º D/E/I/J/L"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span> <span>x</span> <span class="team-label">Melhor 3º D/E/I/J/L</span></div>
-          <div>Scheduled | Atual 1º Grupo K | Candidatos: D: Paraguai, E: Equador, I: Senegal, J: Argélia, L: Croácia</div>
+          <div class="score" aria-label="Colômbia x Gana"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
       </div>
     </section>
@@ -791,7 +930,7 @@
         <div class="bracket-grid">
           <div class="bracket-round left">
             <div class="bracket-round-title">Fase de 32</div>
-          <article class="bracket-match " aria-label="África do Sul x Canadá">
+          <article class="bracket-match completed" aria-label="África do Sul 0 x 1 Canadá">
             <div class="bracket-meta">
               <span>28/06 16:00</span>
               <span>SoFi Stadium</span>
@@ -800,36 +939,36 @@
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">0</span>
             </div>
-            <div class="bracket-team">
+            <div class="bracket-team winner">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">1</span>
             </div>
-            <div class="bracket-status">Agendado</div>
+            <div class="bracket-status">Encerrado</div>
           </article>
-          <article class="bracket-match " aria-label="Brasil x Japão">
+          <article class="bracket-match completed" aria-label="Brasil 2 x 1 Japão">
             <div class="bracket-meta">
               <span>29/06 14:00</span>
               <span>NRG Stadium</span>
             </div>
-            <div class="bracket-team">
+            <div class="bracket-team winner">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">2</span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">1</span>
             </div>
-            <div class="bracket-status">Agendado</div>
+            <div class="bracket-status">Encerrado</div>
           </article>
-          <article class="bracket-match " aria-label="Alemanha x Melhor 3º A/B/C/D/F">
+          <article class="bracket-match live" aria-label="Alemanha 0 x 1 Paraguai">
             <div class="bracket-meta">
               <span>29/06 17:30</span>
               <span>Gillette Stadium</span>
@@ -838,18 +977,17 @@
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">0</span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º A/B/C/D/F</span>
-                <span class="bracket-team-note">Candidatos: A: Coreia do Sul, B: Bósnia e Herzegovina, C: Escócia, D: Paraguai, F: Suécia</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/par.png" alt="">Paraguai</span>
               </div>
-              <span class="bracket-score"></span>
+              <span class="bracket-score">1</span>
             </div>
-            <div class="bracket-status">Agendado</div>
+            <div class="bracket-status">Ao vivo</div>
           </article>
-          <article class="bracket-match " aria-label="Países Baixos x Marrocos">
+          <article class="bracket-match upcoming" aria-label="Países Baixos x Marrocos">
             <div class="bracket-meta">
               <span>29/06 22:00</span>
               <span>Estadio BBVA</span>
@@ -868,7 +1006,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Costa do Marfim x Noruega">
+          <article class="bracket-match upcoming" aria-label="Costa do Marfim x Noruega">
             <div class="bracket-meta">
               <span>30/06 14:00</span>
               <span>AT&amp;T Stadium</span>
@@ -882,13 +1020,12 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nor.png" alt="">Noruega</span>
-                <span class="bracket-team-note">Atual 2º Grupo I</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="França x Melhor 3º C/D/F/G/H">
+          <article class="bracket-match upcoming" aria-label="França x Suécia">
             <div class="bracket-meta">
               <span>30/06 18:00</span>
               <span>MetLife Stadium</span>
@@ -896,20 +1033,18 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span>
-                <span class="bracket-team-note">Atual 1º Grupo I</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º C/D/F/G/H</span>
-                <span class="bracket-team-note">Candidatos: C: Escócia, D: Paraguai, F: Suécia, G: Bélgica, H: Cabo Verde</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="México x Melhor 3º C/E/F/H/I">
+          <article class="bracket-match upcoming" aria-label="México x Equador">
             <div class="bracket-meta">
               <span>30/06 22:00</span>
               <span>Estadio Banorte</span>
@@ -922,14 +1057,13 @@
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º C/E/F/H/I</span>
-                <span class="bracket-team-note">Candidatos: C: Escócia, E: Equador, F: Suécia, H: Cabo Verde, I: Senegal</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Inglaterra x Melhor 3º E/H/I/J/K">
+          <article class="bracket-match upcoming" aria-label="Inglaterra x RD Congo">
             <div class="bracket-meta">
               <span>01/07 13:00</span>
               <span>Mercedes-Benz Stadium</span>
@@ -937,14 +1071,12 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span>
-                <span class="bracket-team-note">Atual 1º Grupo L</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º E/H/I/J/K</span>
-                <span class="bracket-team-note">Candidatos: E: Equador, H: Cabo Verde, I: Senegal, J: Argélia, K: RD Congo</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span>
               </div>
               <span class="bracket-score"></span>
             </div>
@@ -953,15 +1085,14 @@
           </div>
           <div class="bracket-round left">
             <div class="bracket-round-title">Oitavas de final</div>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 1 x Vencedor Fase de 32 3">
+          <article class="bracket-match upcoming" aria-label="Canadá x Vencedor Fase de 32 3">
             <div class="bracket-meta">
               <span>04/07 14:00</span>
               <span>NRG Stadium</span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Vencedor Fase de 32 1</span>
-                <span class="bracket-team-note">A definir</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span>
               </div>
               <span class="bracket-score"></span>
             </div>
@@ -974,7 +1105,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 2 x Vencedor Fase de 32 5">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 2 x Vencedor Fase de 32 5">
             <div class="bracket-meta">
               <span>04/07 18:00</span>
               <span>Lincoln Financial Field</span>
@@ -982,7 +1113,7 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label">Vencedor Fase de 32 2</span>
-                <span class="bracket-team-note">A definir</span>
+                <span class="bracket-team-note">A confirmar; feed também lista Brasil</span>
               </div>
               <span class="bracket-score"></span>
             </div>
@@ -995,15 +1126,14 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 4 x Vencedor Fase de 32 6">
+          <article class="bracket-match upcoming" aria-label="Brasil x Vencedor Fase de 32 6">
             <div class="bracket-meta">
               <span>05/07 17:00</span>
               <span>MetLife Stadium</span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Vencedor Fase de 32 4</span>
-                <span class="bracket-team-note">A definir</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span>
               </div>
               <span class="bracket-score"></span>
             </div>
@@ -1016,7 +1146,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 7 x Vencedor Fase de 32 8">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 7 x Vencedor Fase de 32 8">
             <div class="bracket-meta">
               <span>05/07 21:00</span>
               <span>Estadio Banorte</span>
@@ -1040,7 +1170,7 @@
           </div>
           <div class="bracket-round left">
             <div class="bracket-round-title">Quartas de final</div>
-          <article class="bracket-match " aria-label="Vencedor Oitavas 1 x Vencedor Oitavas 2">
+          <article class="bracket-match upcoming" aria-label="Vencedor Oitavas 1 x Vencedor Oitavas 2">
             <div class="bracket-meta">
               <span>09/07 17:00</span>
               <span>Gillette Stadium</span>
@@ -1061,7 +1191,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Oitavas 5 x Vencedor Oitavas 6">
+          <article class="bracket-match upcoming" aria-label="Vencedor Oitavas 5 x Vencedor Oitavas 6">
             <div class="bracket-meta">
               <span>10/07 16:00</span>
               <span>SoFi Stadium</span>
@@ -1085,7 +1215,7 @@
           </div>
           <div class="bracket-round left">
             <div class="bracket-round-title">Semifinais</div>
-          <article class="bracket-match " aria-label="Vencedor Quartas 1 x Vencedor Quartas 2">
+          <article class="bracket-match upcoming" aria-label="Vencedor Quartas 1 x Vencedor Quartas 2">
             <div class="bracket-meta">
               <span>14/07 16:00</span>
               <span>AT&amp;T Stadium</span>
@@ -1109,7 +1239,7 @@
           </div>
           <div class="bracket-center">
             <div class="bracket-round-title">Final</div>
-                      <article class="bracket-match bracket-final-card" aria-label="Vencedor Semifinal 1 x Vencedor Semifinal 2">
+                      <article class="bracket-match upcoming bracket-final-card" aria-label="Vencedor Semifinal 1 x Vencedor Semifinal 2">
             <div class="bracket-meta">
               <span>19/07 16:00</span>
               <span>MetLife Stadium</span>
@@ -1139,7 +1269,7 @@
           </div>
           <div class="bracket-round right">
             <div class="bracket-round-title">Semifinais</div>
-          <article class="bracket-match " aria-label="Vencedor Quartas 3 x Vencedor Quartas 4">
+          <article class="bracket-match upcoming" aria-label="Vencedor Quartas 3 x Vencedor Quartas 4">
             <div class="bracket-meta">
               <span>15/07 16:00</span>
               <span>Mercedes-Benz Stadium</span>
@@ -1163,7 +1293,7 @@
           </div>
           <div class="bracket-round right">
             <div class="bracket-round-title">Quartas de final</div>
-          <article class="bracket-match " aria-label="Vencedor Oitavas 3 x Vencedor Oitavas 4">
+          <article class="bracket-match upcoming" aria-label="Vencedor Oitavas 3 x Vencedor Oitavas 4">
             <div class="bracket-meta">
               <span>11/07 18:00</span>
               <span>Hard Rock Stadium</span>
@@ -1184,7 +1314,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Oitavas 7 x Vencedor Oitavas 8">
+          <article class="bracket-match upcoming" aria-label="Vencedor Oitavas 7 x Vencedor Oitavas 8">
             <div class="bracket-meta">
               <span>11/07 22:00</span>
               <span>GEHA Field at Arrowhead Stadium</span>
@@ -1208,7 +1338,7 @@
           </div>
           <div class="bracket-round right">
             <div class="bracket-round-title">Oitavas de final</div>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 11 x Vencedor Fase de 32 12">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 11 x Vencedor Fase de 32 12">
             <div class="bracket-meta">
               <span>06/07 16:00</span>
               <span>AT&amp;T Stadium</span>
@@ -1229,7 +1359,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 9 x Vencedor Fase de 32 10">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 9 x Vencedor Fase de 32 10">
             <div class="bracket-meta">
               <span>06/07 21:00</span>
               <span>Lumen Field</span>
@@ -1250,7 +1380,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 14 x Vencedor Fase de 32 16">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 14 x Vencedor Fase de 32 16">
             <div class="bracket-meta">
               <span>07/07 13:00</span>
               <span>Mercedes-Benz Stadium</span>
@@ -1271,7 +1401,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Vencedor Fase de 32 13 x Vencedor Fase de 32 15">
+          <article class="bracket-match upcoming" aria-label="Vencedor Fase de 32 13 x Vencedor Fase de 32 15">
             <div class="bracket-meta">
               <span>07/07 17:00</span>
               <span>BC Place</span>
@@ -1295,28 +1425,26 @@
           </div>
           <div class="bracket-round right">
             <div class="bracket-round-title">Fase de 32</div>
-          <article class="bracket-match " aria-label="Egito x Melhor 3º A/E/H/I/J">
+          <article class="bracket-match upcoming" aria-label="Bélgica x Senegal">
             <div class="bracket-meta">
               <span>01/07 17:00</span>
               <span>Lumen Field</span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span>
-                <span class="bracket-team-note">Atual 1º Grupo G</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bel.png" alt="">Bélgica</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º A/E/H/I/J</span>
-                <span class="bracket-team-note">Candidatos: A: Coreia do Sul, E: Equador, H: Cabo Verde, I: Senegal, J: Argélia</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sen.png" alt="">Senegal</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Estados Unidos x Bósnia e Herzegovina">
+          <article class="bracket-match upcoming" aria-label="Estados Unidos x Bósnia e Herzegovina">
             <div class="bracket-meta">
               <span>01/07 21:00</span>
               <span>Levi&#x27;s Stadium</span>
@@ -1335,7 +1463,7 @@
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Espanha x Áustria">
+          <article class="bracket-match upcoming" aria-label="Espanha x Áustria">
             <div class="bracket-meta">
               <span>02/07 16:00</span>
               <span>SoFi Stadium</span>
@@ -1343,20 +1471,18 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/esp.png" alt="">Espanha</span>
-                <span class="bracket-team-note">Atual 1º Grupo H</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aut.png" alt="">Áustria</span>
-                <span class="bracket-team-note">Atual 2º Grupo J</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Portugal x Gana">
+          <article class="bracket-match upcoming" aria-label="Portugal x Croácia">
             <div class="bracket-meta">
               <span>02/07 20:00</span>
               <span>BMO Field</span>
@@ -1364,20 +1490,18 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span>
-                <span class="bracket-team-note">Atual 2º Grupo K</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span>
-                <span class="bracket-team-note">Atual 2º Grupo L</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cro.png" alt="">Croácia</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Suíça x Melhor 3º E/F/G/I/J">
+          <article class="bracket-match upcoming" aria-label="Suíça x Argélia">
             <div class="bracket-meta">
               <span>03/07 00:00</span>
               <span>BC Place</span>
@@ -1390,14 +1514,13 @@
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º E/F/G/I/J</span>
-                <span class="bracket-team-note">Candidatos: E: Equador, F: Suécia, G: Bélgica, I: Senegal, J: Argélia</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/alg.png" alt="">Argélia</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Austrália x Irã">
+          <article class="bracket-match upcoming" aria-label="Austrália x Egito">
             <div class="bracket-meta">
               <span>03/07 15:00</span>
               <span>AT&amp;T Stadium</span>
@@ -1410,14 +1533,13 @@
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irn.png" alt="">Irã</span>
-                <span class="bracket-team-note">Atual 2º Grupo G</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Argentina x Uruguai">
+          <article class="bracket-match upcoming" aria-label="Argentina x Cabo Verde">
             <div class="bracket-meta">
               <span>03/07 19:00</span>
               <span>Hard Rock Stadium</span>
@@ -1430,14 +1552,13 @@
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uru.png" alt="">Uruguai</span>
-                <span class="bracket-team-note">Atual 2º Grupo H</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cpv.png" alt="">Cabo Verde</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-status">Agendado</div>
           </article>
-          <article class="bracket-match " aria-label="Colômbia x Melhor 3º D/E/I/J/L">
+          <article class="bracket-match upcoming" aria-label="Colômbia x Gana">
             <div class="bracket-meta">
               <span>03/07 22:30</span>
               <span>GEHA Field at Arrowhead Stadium</span>
@@ -1445,14 +1566,12 @@
             <div class="bracket-team">
               <div class="bracket-team-text">
                 <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span>
-                <span class="bracket-team-note">Atual 1º Grupo K</span>
               </div>
               <span class="bracket-score"></span>
             </div>
             <div class="bracket-team">
               <div class="bracket-team-text">
-                <span class="team-label">Melhor 3º D/E/I/J/L</span>
-                <span class="bracket-team-note">Candidatos: D: Paraguai, E: Equador, I: Senegal, J: Argélia, L: Croácia</span>
+                <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span>
               </div>
               <span class="bracket-score"></span>
             </div>
@@ -1464,9 +1583,11 @@
     </section>
         <section id="tabela-grupos">
       <h2>Tabela dos grupos</h2>
-      <h3>Grupo A</h3>
-      <div class="table-wrap">
-        <table>
+      <div class="group-grid">
+      <article class="group-card">
+        <h3>Grupo A</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1482,7 +1603,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span></td>
               <td>3</td>
@@ -1494,7 +1615,7 @@
               <td>+6</td>
               <td>9</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span></td>
               <td>3</td>
@@ -1506,7 +1627,7 @@
               <td>-1</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">Coreia do Sul</span></td>
               <td>3</td>
@@ -1518,7 +1639,7 @@
               <td>-1</td>
               <td>3</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span></td>
               <td>3</td>
@@ -1532,10 +1653,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo B</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo B</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1551,7 +1674,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sui.png" alt="">Suíça</span></td>
               <td>3</td>
@@ -1563,7 +1686,7 @@
               <td>+4</td>
               <td>7</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span></td>
               <td>3</td>
@@ -1575,7 +1698,7 @@
               <td>+5</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bósnia e Herzegovina</span></td>
               <td>3</td>
@@ -1587,7 +1710,7 @@
               <td>-1</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/qat.png" alt="">Catar</span></td>
               <td>3</td>
@@ -1601,10 +1724,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo C</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo C</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1620,7 +1745,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span></td>
               <td>3</td>
@@ -1632,7 +1757,7 @@
               <td>+6</td>
               <td>7</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mar.png" alt="">Marrocos</span></td>
               <td>3</td>
@@ -1644,7 +1769,7 @@
               <td>+3</td>
               <td>7</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sco.png" alt="">Escócia</span></td>
               <td>3</td>
@@ -1656,7 +1781,7 @@
               <td>-3</td>
               <td>3</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/hai.png" alt="">Haiti</span></td>
               <td>3</td>
@@ -1670,10 +1795,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo D</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo D</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1689,7 +1816,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/usa.png" alt="">Estados Unidos</span></td>
               <td>3</td>
@@ -1701,7 +1828,7 @@
               <td>+4</td>
               <td>6</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aus.png" alt="">Austrália</span></td>
               <td>3</td>
@@ -1713,7 +1840,7 @@
               <td>+0</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/par.png" alt="">Paraguai</span></td>
               <td>3</td>
@@ -1725,7 +1852,7 @@
               <td>-2</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/tur.png" alt="">Turquia</span></td>
               <td>3</td>
@@ -1739,10 +1866,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo E</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo E</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1758,7 +1887,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span></td>
               <td>3</td>
@@ -1770,7 +1899,7 @@
               <td>+6</td>
               <td>6</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/civ.png" alt="">Costa do Marfim</span></td>
               <td>3</td>
@@ -1782,7 +1911,7 @@
               <td>+2</td>
               <td>6</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span></td>
               <td>3</td>
@@ -1794,7 +1923,7 @@
               <td>+0</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/soccer/500/11678.png" alt="">Curaçao</span></td>
               <td>3</td>
@@ -1808,10 +1937,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo F</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo F</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1827,7 +1958,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ned.png" alt="">Países Baixos</span></td>
               <td>3</td>
@@ -1839,7 +1970,7 @@
               <td>+6</td>
               <td>7</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span></td>
               <td>3</td>
@@ -1851,7 +1982,7 @@
               <td>+4</td>
               <td>5</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span></td>
               <td>3</td>
@@ -1863,7 +1994,7 @@
               <td>+0</td>
               <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/tun.png" alt="">Tunísia</span></td>
               <td>3</td>
@@ -1877,10 +2008,12 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo G</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo G</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1896,60 +2029,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>1</td>
-              <td>0</td>
-              <td>4</td>
-              <td>2</td>
-              <td>+2</td>
-              <td>4</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irn.png" alt="">Irã</span></td>
-              <td>2</td>
-              <td>0</td>
-              <td>2</td>
-              <td>0</td>
-              <td>2</td>
-              <td>2</td>
-              <td>+0</td>
-              <td>2</td>
-            </tr>
-            <tr>
-              <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bel.png" alt="">Bélgica</span></td>
+              <td>3</td>
+              <td>1</td>
               <td>2</td>
               <td>0</td>
+              <td>6</td>
               <td>2</td>
-              <td>0</td>
-              <td>1</td>
-              <td>1</td>
-              <td>+0</td>
-              <td>2</td>
+              <td>+4</td>
+              <td>5</td>
             </tr>
-            <tr>
+            <tr class="direct">
+              <td>2</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span></td>
+              <td>3</td>
+              <td>1</td>
+              <td>2</td>
+              <td>0</td>
+              <td>5</td>
+              <td>3</td>
+              <td>+2</td>
+              <td>5</td>
+            </tr>
+            <tr class="third">
+              <td>3</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irn.png" alt="">Irã</span></td>
+              <td>3</td>
+              <td>0</td>
+              <td>3</td>
+              <td>0</td>
+              <td>3</td>
+              <td>3</td>
+              <td>+0</td>
+              <td>3</td>
+            </tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nzl.png" alt="">Nova Zelândia</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>1</td>
-              <td>1</td>
-              <td>3</td>
-              <td>5</td>
-              <td>-2</td>
+              <td>2</td>
+              <td>4</td>
+              <td>10</td>
+              <td>-6</td>
               <td>1</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo H</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo H</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -1965,60 +2100,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/esp.png" alt="">Espanha</span></td>
+              <td>3</td>
               <td>2</td>
               <td>1</td>
-              <td>1</td>
               <td>0</td>
-              <td>4</td>
+              <td>5</td>
               <td>0</td>
-              <td>+4</td>
-              <td>4</td>
+              <td>+5</td>
+              <td>7</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uru.png" alt="">Uruguai</span></td>
-              <td>2</td>
-              <td>0</td>
-              <td>2</td>
-              <td>0</td>
-              <td>3</td>
-              <td>3</td>
-              <td>+0</td>
-              <td>2</td>
-            </tr>
-            <tr>
-              <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cpv.png" alt="">Cabo Verde</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>2</td>
               <td>2</td>
               <td>+0</td>
+              <td>3</td>
+            </tr>
+            <tr class="third">
+              <td>3</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uru.png" alt="">Uruguai</span></td>
+              <td>3</td>
+              <td>0</td>
+              <td>2</td>
+              <td>1</td>
+              <td>3</td>
+              <td>4</td>
+              <td>-1</td>
               <td>2</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ksa.png" alt="">Arábia Saudita</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
-              <td>1</td>
+              <td>2</td>
               <td>1</td>
               <td>1</td>
               <td>5</td>
               <td>-4</td>
-              <td>1</td>
+              <td>2</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo I</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo I</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -2034,60 +2171,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span></td>
-              <td>2</td>
-              <td>2</td>
+              <td>3</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
-              <td>6</td>
-              <td>1</td>
-              <td>+5</td>
-              <td>6</td>
+              <td>10</td>
+              <td>2</td>
+              <td>+8</td>
+              <td>9</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nor.png" alt="">Noruega</span></td>
-              <td>2</td>
-              <td>2</td>
-              <td>0</td>
-              <td>0</td>
-              <td>7</td>
               <td>3</td>
-              <td>+4</td>
+              <td>2</td>
+              <td>0</td>
+              <td>1</td>
+              <td>8</td>
+              <td>7</td>
+              <td>+1</td>
               <td>6</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sen.png" alt="">Senegal</span></td>
-              <td>2</td>
-              <td>0</td>
-              <td>0</td>
-              <td>2</td>
               <td>3</td>
-              <td>6</td>
-              <td>-3</td>
+              <td>1</td>
               <td>0</td>
+              <td>2</td>
+              <td>8</td>
+              <td>6</td>
+              <td>+2</td>
+              <td>3</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irq.png" alt="">Iraque</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
-              <td>2</td>
+              <td>3</td>
               <td>1</td>
-              <td>7</td>
-              <td>-6</td>
+              <td>12</td>
+              <td>-11</td>
               <td>0</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo J</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo J</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -2103,60 +2242,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/arg.png" alt="">Argentina</span></td>
-              <td>2</td>
-              <td>2</td>
+              <td>3</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
-              <td>5</td>
-              <td>0</td>
-              <td>+5</td>
-              <td>6</td>
+              <td>8</td>
+              <td>1</td>
+              <td>+7</td>
+              <td>9</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aut.png" alt="">Áustria</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
               <td>3</td>
-              <td>3</td>
+              <td>1</td>
+              <td>1</td>
+              <td>1</td>
+              <td>6</td>
+              <td>6</td>
               <td>+0</td>
-              <td>3</td>
+              <td>4</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/alg.png" alt="">Argélia</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-              <td>2</td>
-              <td>4</td>
-              <td>-2</td>
               <td>3</td>
+              <td>1</td>
+              <td>1</td>
+              <td>1</td>
+              <td>5</td>
+              <td>7</td>
+              <td>-2</td>
+              <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jor.png" alt="">Jordânia</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
-              <td>2</td>
-              <td>2</td>
-              <td>5</td>
-              <td>-3</td>
+              <td>3</td>
+              <td>3</td>
+              <td>8</td>
+              <td>-5</td>
               <td>0</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo K</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo K</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -2172,60 +2313,62 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span></td>
+              <td>3</td>
               <td>2</td>
-              <td>2</td>
-              <td>0</td>
+              <td>1</td>
               <td>0</td>
               <td>4</td>
               <td>1</td>
               <td>+3</td>
-              <td>6</td>
+              <td>7</td>
             </tr>
-            <tr>
+            <tr class="direct">
               <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span></td>
+              <td>3</td>
+              <td>1</td>
               <td>2</td>
-              <td>1</td>
-              <td>1</td>
               <td>0</td>
               <td>6</td>
               <td>1</td>
               <td>+5</td>
-              <td>4</td>
+              <td>5</td>
             </tr>
-            <tr>
+            <tr class="third">
               <td>3</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span></td>
-              <td>2</td>
-              <td>0</td>
+              <td>3</td>
               <td>1</td>
               <td>1</td>
               <td>1</td>
-              <td>2</td>
-              <td>-1</td>
-              <td>1</td>
+              <td>4</td>
+              <td>3</td>
+              <td>+1</td>
+              <td>4</td>
             </tr>
-            <tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uzb.png" alt="">Uzbequistão</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
+              <td>3</td>
               <td>2</td>
-              <td>1</td>
-              <td>8</td>
-              <td>-7</td>
+              <td>11</td>
+              <td>-9</td>
               <td>0</td>
             </tr>
           </tbody>
         </table>
-      </div>
-      <h3>Grupo L</h3>
-      <div class="table-wrap">
-        <table>
+        </div>
+      </article>
+      <article class="group-card">
+        <h3>Grupo L</h3>
+        <div class="table-wrap">
+        <table class="group-table">
           <thead>
             <tr>
               <th>Pos</th>
@@ -2241,209 +2384,211 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr class="direct">
               <td>1</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>1</td>
-              <td>0</td>
-              <td>4</td>
-              <td>2</td>
-              <td>+2</td>
-              <td>4</td>
-            </tr>
-            <tr>
-              <td>2</td>
-              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></td>
-              <td>2</td>
-              <td>1</td>
-              <td>1</td>
-              <td>0</td>
-              <td>1</td>
-              <td>0</td>
-              <td>+1</td>
-              <td>4</td>
-            </tr>
-            <tr>
               <td>3</td>
+              <td>2</td>
+              <td>1</td>
+              <td>0</td>
+              <td>6</td>
+              <td>2</td>
+              <td>+4</td>
+              <td>7</td>
+            </tr>
+            <tr class="direct">
+              <td>2</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cro.png" alt="">Croácia</span></td>
+              <td>3</td>
               <td>2</td>
-              <td>1</td>
               <td>0</td>
               <td>1</td>
-              <td>3</td>
-              <td>4</td>
-              <td>-1</td>
-              <td>3</td>
+              <td>5</td>
+              <td>5</td>
+              <td>+0</td>
+              <td>6</td>
             </tr>
-            <tr>
+            <tr class="third">
+              <td>3</td>
+              <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></td>
+              <td>3</td>
+              <td>1</td>
+              <td>1</td>
+              <td>1</td>
+              <td>2</td>
+              <td>2</td>
+              <td>+0</td>
+              <td>4</td>
+            </tr>
+            <tr class="eliminated">
               <td>4</td>
               <td class="team"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/pan.png" alt="">Panamá</span></td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
               <td>0</td>
-              <td>2</td>
+              <td>3</td>
               <td>0</td>
-              <td>2</td>
-              <td>-2</td>
+              <td>4</td>
+              <td>-4</td>
               <td>0</td>
             </tr>
           </tbody>
         </table>
+        </div>
+      </article>
       </div>
     </section>
         <section id="proximos-jogos">
       <h2>Proximos jogos</h2>
       <div class="matches">
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
-            <span>26/06/2026 21:00</span>
-            <span>Grupo H</span>
-            <span>NRG Stadium</span>
+            <span>29/06/2026 22:00</span>
+            <span>Fase de 32</span>
+            <span>Estadio BBVA</span>
           </div>
-          <div class="score" aria-label="Cabo Verde x Arábia Saudita"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cpv.png" alt="">Cabo Verde</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ksa.png" alt="">Arábia Saudita</span></div>
-          <div>Scheduled</div>
+          <div class="score" aria-label="Países Baixos x Marrocos"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ned.png" alt="">Países Baixos</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mar.png" alt="">Marrocos</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
-            <span>26/06/2026 21:00</span>
-            <span>Grupo H</span>
-            <span>Estadio Akron</span>
+            <span>30/06/2026 14:00</span>
+            <span>Fase de 32</span>
+            <span>AT&amp;T Stadium</span>
           </div>
-          <div class="score" aria-label="Uruguai x Espanha"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uru.png" alt="">Uruguai</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/esp.png" alt="">Espanha</span></div>
-          <div>Scheduled</div>
+          <div class="score" aria-label="Costa do Marfim x Noruega"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/civ.png" alt="">Costa do Marfim</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nor.png" alt="">Noruega</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
-            <span>27/06/2026 00:00</span>
-            <span>Grupo G</span>
-            <span>Lumen Field</span>
-          </div>
-          <div class="score" aria-label="Egito x Irã"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/egy.png" alt="">Egito</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/irn.png" alt="">Irã</span></div>
-          <div>Scheduled</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>27/06/2026 00:00</span>
-            <span>Grupo G</span>
-            <span>BC Place</span>
-          </div>
-          <div class="score" aria-label="Nova Zelândia x Bélgica"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/nzl.png" alt="">Nova Zelândia</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bel.png" alt="">Bélgica</span></div>
-          <div>Scheduled</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>27/06/2026 18:00</span>
-            <span>Grupo L</span>
-            <span>Lincoln Financial Field</span>
-          </div>
-          <div class="score" aria-label="Croácia x Gana"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cro.png" alt="">Croácia</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></div>
-          <div>Scheduled</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>27/06/2026 18:00</span>
-            <span>Grupo L</span>
+            <span>30/06/2026 18:00</span>
+            <span>Fase de 32</span>
             <span>MetLife Stadium</span>
           </div>
-          <div class="score" aria-label="Panamá x Inglaterra"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/pan.png" alt="">Panamá</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span></div>
-          <div>Scheduled</div>
+          <div class="score" aria-label="França x Suécia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/fra.png" alt="">França</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
-            <span>27/06/2026 20:30</span>
-            <span>Grupo K</span>
-            <span>Hard Rock Stadium</span>
+            <span>30/06/2026 22:00</span>
+            <span>Fase de 32</span>
+            <span>Estadio Banorte</span>
           </div>
-          <div class="score" aria-label="Colômbia x Portugal"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span></div>
-          <div>Scheduled</div>
+          <div class="score" aria-label="México x Equador"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
-        <article class="match">
+        <article class="match upcoming">
           <div class="match-top">
-            <span>27/06/2026 20:30</span>
-            <span>Grupo K</span>
+            <span>01/07/2026 13:00</span>
+            <span>Fase de 32</span>
             <span>Mercedes-Benz Stadium</span>
           </div>
-          <div class="score" aria-label="RD Congo x Uzbequistão"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uzb.png" alt="">Uzbequistão</span></div>
-          <div>Scheduled</div>
+          <div class="score" aria-label="Inglaterra x RD Congo"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span></div>
+          <div class="match-detail">Scheduled</div>
+        </article>
+        <article class="match upcoming">
+          <div class="match-top">
+            <span>01/07/2026 17:00</span>
+            <span>Fase de 32</span>
+            <span>Lumen Field</span>
+          </div>
+          <div class="score" aria-label="Bélgica x Senegal"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bel.png" alt="">Bélgica</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/sen.png" alt="">Senegal</span></div>
+          <div class="match-detail">Scheduled</div>
+        </article>
+        <article class="match upcoming">
+          <div class="match-top">
+            <span>01/07/2026 21:00</span>
+            <span>Fase de 32</span>
+            <span>Levi&#x27;s Stadium</span>
+          </div>
+          <div class="score" aria-label="Estados Unidos x Bósnia e Herzegovina"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/usa.png" alt="">Estados Unidos</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bih.png" alt="">Bósnia e Herzegovina</span></div>
+          <div class="match-detail">Scheduled</div>
+        </article>
+        <article class="match upcoming">
+          <div class="match-top">
+            <span>02/07/2026 16:00</span>
+            <span>Fase de 32</span>
+            <span>SoFi Stadium</span>
+          </div>
+          <div class="score" aria-label="Espanha x Áustria"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/esp.png" alt="">Espanha</span> <span>x</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aut.png" alt="">Áustria</span></div>
+          <div class="match-detail">Scheduled</div>
         </article>
       </div>
     </section>
         <section id="resultados-recentes">
       <h2>Resultados recentes</h2>
       <div class="matches">
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>24/06/2026 22:00</span>
-            <span>Grupo A</span>
-            <span>Estadio Banorte</span>
-          </div>
-          <div class="score" aria-label="Tchéquia 0 x 3 México"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cze.png" alt="">Tchéquia</span> <span>0 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/mex.png" alt="">México</span></div>
-          <div>FT</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>24/06/2026 22:00</span>
-            <span>Grupo A</span>
-            <span>Estadio BBVA</span>
-          </div>
-          <div class="score" aria-label="África do Sul 1 x 0 Coreia do Sul"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span> <span>1 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/kors.png" alt="">Coreia do Sul</span></div>
-          <div>FT</div>
-        </article>
-        <article class="match">
-          <div class="match-top">
-            <span>25/06/2026 17:00</span>
-            <span>Grupo E</span>
+            <span>27/06/2026 18:00</span>
+            <span>Grupo L</span>
             <span>Lincoln Financial Field</span>
           </div>
-          <div class="score" aria-label="Curaçao 0 x 2 Costa do Marfim"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/soccer/500/11678.png" alt="">Curaçao</span> <span>0 x 2</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/civ.png" alt="">Costa do Marfim</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="Croácia 2 x 1 Gana"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/cro.png" alt="">Croácia</span> <span>2 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/gha.png" alt="">Gana</span></div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>25/06/2026 17:00</span>
-            <span>Grupo E</span>
+            <span>27/06/2026 18:00</span>
+            <span>Grupo L</span>
             <span>MetLife Stadium</span>
           </div>
-          <div class="score" aria-label="Equador 2 x 1 Alemanha"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ecu.png" alt="">Equador</span> <span>2 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ger.png" alt="">Alemanha</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="Panamá 0 x 2 Inglaterra"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/pan.png" alt="">Panamá</span> <span>0 x 2</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/eng.png" alt="">Inglaterra</span></div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>25/06/2026 20:00</span>
-            <span>Grupo F</span>
-            <span>AT&amp;T Stadium</span>
+            <span>27/06/2026 20:30</span>
+            <span>Grupo K</span>
+            <span>Hard Rock Stadium</span>
           </div>
-          <div class="score" aria-label="Japão 1 x 1 Suécia"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span> <span>1 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/swe.png" alt="">Suécia</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="Colômbia 0 x 0 Portugal"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/col.png" alt="">Colômbia</span> <span>0 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/por.png" alt="">Portugal</span></div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>25/06/2026 20:00</span>
-            <span>Grupo F</span>
+            <span>27/06/2026 20:30</span>
+            <span>Grupo K</span>
+            <span>Mercedes-Benz Stadium</span>
+          </div>
+          <div class="score" aria-label="RD Congo 3 x 1 Uzbequistão"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rdc.png" alt="">RD Congo</span> <span>3 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/uzb.png" alt="">Uzbequistão</span></div>
+          <div class="match-detail">FT</div>
+        </article>
+        <article class="match completed">
+          <div class="match-top">
+            <span>27/06/2026 23:00</span>
+            <span>Grupo J</span>
             <span>GEHA Field at Arrowhead Stadium</span>
           </div>
-          <div class="score" aria-label="Tunísia 1 x 3 Países Baixos"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/tun.png" alt="">Tunísia</span> <span>1 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/ned.png" alt="">Países Baixos</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="Argélia 3 x 3 Áustria"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/alg.png" alt="">Argélia</span> <span>3 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aut.png" alt="">Áustria</span></div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>25/06/2026 23:00</span>
-            <span>Grupo D</span>
-            <span>Levi&#x27;s Stadium</span>
+            <span>27/06/2026 23:00</span>
+            <span>Grupo J</span>
+            <span>AT&amp;T Stadium</span>
           </div>
-          <div class="score" aria-label="Paraguai 0 x 0 Austrália"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/par.png" alt="">Paraguai</span> <span>0 x 0</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/aus.png" alt="">Austrália</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="Jordânia 1 x 3 Argentina"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jor.png" alt="">Jordânia</span> <span>1 x 3</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/arg.png" alt="">Argentina</span></div>
+          <div class="match-detail">FT</div>
         </article>
-        <article class="match">
+        <article class="match completed">
           <div class="match-top">
-            <span>25/06/2026 23:00</span>
-            <span>Grupo D</span>
+            <span>28/06/2026 16:00</span>
+            <span>Fase de 32</span>
             <span>SoFi Stadium</span>
           </div>
-          <div class="score" aria-label="Turquia 3 x 2 Estados Unidos"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/tur.png" alt="">Turquia</span> <span>3 x 2</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/usa.png" alt="">Estados Unidos</span></div>
-          <div>FT</div>
+          <div class="score" aria-label="África do Sul 0 x 1 Canadá"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/rsa.png" alt="">África do Sul</span> <span>0 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/can.png" alt="">Canadá</span></div>
+          <div class="match-detail">FT</div>
+        </article>
+        <article class="match completed">
+          <div class="match-top">
+            <span>29/06/2026 14:00</span>
+            <span>Fase de 32</span>
+            <span>NRG Stadium</span>
+          </div>
+          <div class="score" aria-label="Brasil 2 x 1 Japão"><span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/bra.png" alt="">Brasil</span> <span>2 x 1</span> <span class="team-label"><img class="team-flag" src="https://a.espncdn.com/i/teamlogos/countries/500/jpn.png" alt="">Japão</span></div>
+          <div class="match-detail">FT</div>
         </article>
       </div>
     </section>
